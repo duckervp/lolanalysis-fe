@@ -15,6 +15,7 @@ export const getChampionImageUrl = (champion) => {
 export const getItemImageUrl = (item) => {
     if (itemAsset.data[item]) {
         const {full, group} = itemAsset.data[item].image;
+        console.log(full, group);
         return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`
     }
     return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/item/${item}.png`;
@@ -23,7 +24,7 @@ export const getItemImageUrl = (item) => {
 export const getSummonerImageUrl = (summonerId) => {
     const summoners = summonerAsset.data;
 
-    const selectedSummoner = summoners.filter(summoner => summoner.key === summonerId)[0];
+    const selectedSummoner = Object.values(summoners).filter(summoner => parseInt(summoner.key, 10) === summonerId)[0];
 
     if (selectedSummoner) {
         const {full, group} = selectedSummoner.image;

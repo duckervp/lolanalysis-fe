@@ -78,6 +78,7 @@ export default function AppView() {
       championName: participant.championName,
       championLevel: participant.champLevel,
       goldEarned: participant.goldEarned,
+      totalMinionsKilled: participant.totalMinionsKilled,
       item0: participant.item0,
       item1: participant.item1,
       item2: participant.item2,
