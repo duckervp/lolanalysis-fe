@@ -31,12 +31,12 @@ export default function AppMatchHistory({ title, subheader, list, ...other }) {
       <CardHeader title={title} subheader={subheader} />
 
       <Scrollbar>
-        <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
+        <Stack sx={{ p: 3, pr: 0 }}>
           {list.map((match) => (
-            <>
-              <MatchItem key={match.matchId} match={match} />
-              <Divider variant="middle" />
-            </>
+            <Box key={match.matchId}>
+              <MatchItem match={match}/>
+              <Divider variant="middle" sx={{my: 1.5}}/>
+            </Box>
           ))}
         </Stack>
       </Scrollbar>
@@ -65,8 +65,6 @@ AppMatchHistory.propTypes = {
 // ----------------------------------------------------------------------
 
 function MatchItem({ match }) {
-  console.log(match);
-
   const [currentUserChamp, setCurrentUserChamp] = useState();
 
   useEffect(() => {
@@ -169,13 +167,19 @@ function MatchItem({ match }) {
             <Box component="img" src="src/assets/Gold.webp" sx={{ height: 15 }} />
           </Stack>
         </Stack>
+        <Stack>
+          
+
+        </Stack>
       </Stack>
+
     </Stack>
   );
 }
 
 const getItemBox = (itemId) => {
-  if (itemId === 0) {
+  const imageUrl = getItemImageUrl(itemId);
+  if (itemId === 0 || !imageUrl) {
     return (
       <Box
         sx={{
@@ -192,7 +196,7 @@ const getItemBox = (itemId) => {
     <Box
       component="img"
       alt={`item-${itemId}`}
-      src={getItemImageUrl(itemId)}
+      src={imageUrl}
       sx={{ width: 40, height: 40, flexShrink: 0, border: '1px solid brown', marginLeft: '-1px' }}
     />
   );
@@ -205,6 +209,7 @@ MatchItem.propTypes = {
     gameCreation: PropTypes.number,
     gameDuration: PropTypes.number,
     gameMode: PropTypes.string,
+    mapId: PropTypes.number,
     participantDetails: PropTypes.arrayOf(
       PropTypes.shape({
         win: PropTypes.bool,

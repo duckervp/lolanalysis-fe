@@ -24,13 +24,13 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+  const currentAccount = JSON.parse(localStorage.getItem(ACCOUNT_ATTR));
   const [matchIds, setMatchIds] = useState([]);
   const [matches, setMatches] = useState([]);
 
   useEffect(() => {
     const fetchMatchHistory = async () => {
       if (localStorage.getItem(ACCOUNT_ATTR)) {
-        const currentAccount = JSON.parse(localStorage.getItem(ACCOUNT_ATTR));
         if (currentAccount.puuid) {
           const matchIdsData = await callRiotMatchHistoryApi(currentAccount.puuid);
           console.log(matchIdsData);
@@ -39,7 +39,7 @@ export default function AppView() {
       }
     };
     fetchMatchHistory();
-  }, []);
+  }, [currentAccount]);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -54,8 +54,6 @@ export default function AppView() {
 
     fetchMatches();
   }, [matchIds]);
-
-  console.log(matches);
 
   const callRiotMatchHistoryApi = async (puuid) => {
     console.log('Call api');
@@ -99,6 +97,7 @@ export default function AppView() {
       gameCreation: matchData.info.gameCreation,
       gameDuration: matchData.info.gameDuration,
       gameMode: matchData.info.gameMode,
+      mapId: matchData.info.mapId,
       participantDetails,
     };
 

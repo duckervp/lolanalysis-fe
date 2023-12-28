@@ -1,3 +1,4 @@
+import mapAsset from "src/assets/map.json";
 import itemAsset from "src/assets/item.json";
 import championAsset from "src/assets/champion.json";
 import summonerAsset from "src/assets/summoner.json";
@@ -9,7 +10,7 @@ export const getChampionImageUrl = (champion) => {
         const {full, group} = championAsset.data[champion].image;
         return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`
     }
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/champion/${champion}.png`;
+    return undefined;
 } 
 
 export const getItemImageUrl = (item) => {
@@ -18,7 +19,7 @@ export const getItemImageUrl = (item) => {
         console.log(full, group);
         return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`
     }
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/item/${item}.png`;
+    return undefined;
 } 
 
 export const getSummonerImageUrl = (summonerId) => {
@@ -30,7 +31,7 @@ export const getSummonerImageUrl = (summonerId) => {
         const {full, group} = selectedSummoner.image;
         return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`
     }
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/spell/${summonerId}.png`;
+    return undefined;
 } 
 
 export const getProfileIconImageUrl = (profileIconId) => {
@@ -40,6 +41,13 @@ export const getProfileIconImageUrl = (profileIconId) => {
         const {full, group} = profileIconAsset.data[profileIcon].image;
         return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`
     }
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/profileicon/${profileIconId}.png`;
+    return undefined;
 } 
+
+export const getMapName = (mapId) => {
+    if (mapAsset.data[mapId]) {
+        return mapAsset.data[mapId].MapName;
+    }
+    return undefined;
+}
 
