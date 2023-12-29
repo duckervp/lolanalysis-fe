@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { faker } from '@faker-js/faker';
+import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { BASE_URL, ACCOUNT_ATTR } from 'src/app-config';
+import { BASE_URL } from 'src/app-config';
+import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 
 import Iconify from 'src/components/iconify';
 
@@ -24,22 +26,23 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
-  const currentAccount = JSON.parse(localStorage.getItem(ACCOUNT_ATTR));
+  console.log("Appview rendered");
+  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid); 
+
   const [matchIds, setMatchIds] = useState([]);
+
   const [matches, setMatches] = useState([]);
 
   useEffect(() => {
     const fetchMatchHistory = async () => {
-      if (localStorage.getItem(ACCOUNT_ATTR)) {
-        if (currentAccount.puuid) {
-          const matchIdsData = await callRiotMatchHistoryApi(currentAccount.puuid);
+        if (currentAccountPuuid) {
+          const matchIdsData = await callRiotMatchHistoryApi(currentAccountPuuid);
           console.log(matchIdsData);
           setMatchIds(matchIdsData);
         }
-      }
     };
     fetchMatchHistory();
-  }, [currentAccount]);
+  }, [currentAccountPuuid]);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -57,7 +60,7 @@ export default function AppView() {
 
   const callRiotMatchHistoryApi = async (puuid) => {
     console.log('Call api');
-    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=5`;
+    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
     const { data: result } = await axios.get(url);
     return result.data;
   };

@@ -25,3 +25,12 @@ export function fToNow(date) {
       })
     : '';
 }
+
+export function fToMinuteSecondString(originSeconds) {
+  const seconds = originSeconds % 60;
+  const minutes = (originSeconds - seconds)/60;
+  return ""
+    .concat(String(minutes).padStart(2, '0'))
+    .concat(":")
+    .concat(String(seconds).padStart(2, '0'));
+}

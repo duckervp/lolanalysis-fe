@@ -9,10 +9,13 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
+import PanoramaFishEyeTwoToneIcon from '@mui/icons-material/PanoramaFishEyeTwoTone';
 
 // import { fToNow } from 'src/utils/format-time';
 import { numberWithCommas } from 'src/utils/format-number';
+import { fDate, fDateTime, fToMinuteSecondString } from 'src/utils/format-time';
 import {
+  getMapName,
   getItemImageUrl,
   getChampionImageUrl,
   getSummonerImageUrl,
@@ -22,6 +25,7 @@ import { ACCOUNT_ATTR } from 'src/app-config';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
+
 
 // ----------------------------------------------------------------------
 
@@ -34,8 +38,8 @@ export default function AppMatchHistory({ title, subheader, list, ...other }) {
         <Stack sx={{ p: 3, pr: 0 }}>
           {list.map((match) => (
             <Box key={match.matchId}>
-              <MatchItem match={match}/>
-              <Divider variant="middle" sx={{my: 1.5}}/>
+              <MatchItem match={match} />
+              <Divider variant="middle" sx={{ my: 2.5 }} />
             </Box>
           ))}
         </Stack>
@@ -81,7 +85,7 @@ function MatchItem({ match }) {
   }, [match]);
 
   return (
-    <Stack direction="row" alignItems="center" spacing={2}>
+    <Stack direction="row" spacing={2}>
       <Box sx={{ position: 'relative' }}>
         <Box
           component="img"
@@ -111,7 +115,7 @@ function MatchItem({ match }) {
       </Box>
       <Box sx={{ width: 5 }} />
       <Box>
-        <Typography variant="subtitle1" sx={{ height: 15 }}>
+        <Typography variant="subtitle1" sx={currentUserChamp?.win ? {color: "green", height: 15} : {color: "red", height: 15}}>
           {currentUserChamp?.win ? 'WIN' : 'LOST'}
         </Typography>
         <Typography variant="caption">{match?.gameMode}</Typography>
@@ -147,35 +151,42 @@ function MatchItem({ match }) {
           sx={{ pt: 1, height: 1 }}
           justifyContent="space-between"
         >
-          <Typography variant="body1" sx={{ height: 18 }}>
+          <Typography variant="body1" sx={{ height: 18 }} width="80px">
             {currentUserChamp?.kills} / {currentUserChamp?.deaths} / {currentUserChamp?.assists}
           </Typography>
-          <Stack direction="row" alignItems="center">
+          <Stack direction="row" alignItems="flex-end" spacing={0.5} width="50px">
             <Typography variant="body1" sx={{ height: 18 }}>
               {currentUserChamp?.totalMinionsKilled}
             </Typography>
             <Box
               component="img"
               src="src/assets/Minion_icon.webp"
-              sx={{ width: 15, height: 15, backgroundColor: 'darkgray' }}
+              sx={{ width: 12.5, height: 12.5, backgroundColor: 'darkgray' }}
             />
           </Stack>
-          <Stack direction="row" alignItems="center">
+          <Stack direction="row" alignItems="flex-end" spacing={0.5}>
             <Typography variant="body1" sx={{ height: 18 }}>
               {numberWithCommas(currentUserChamp?.goldEarned)}
             </Typography>
-            <Box component="img" src="src/assets/Gold.webp" sx={{ height: 15 }} />
+            <Box component="img" src="src/assets/Gold.webp" sx={{ height: 12.5 }} />
           </Stack>
         </Stack>
-        <Stack>
-          
-
+      </Stack>
+      <Stack alignItems="flex-start">
+        <Typography variant='body2'>{getMapName(match?.mapId)}</Typography>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography variant='body2'>{fToMinuteSecondString(match?.gameDuration)}</Typography>
+          <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
+          <Typography variant='body2'>{fDate(match?.gameCreation, "dd/MM/yyyy")}</Typography>
+          <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
+          <Typography variant='body2'>{fDateTime(match?.gameCreation, "p")}</Typography>
         </Stack>
       </Stack>
-
     </Stack>
   );
 }
+
+
 
 const getItemBox = (itemId) => {
   const imageUrl = getItemImageUrl(itemId);
@@ -219,7 +230,7 @@ MatchItem.propTypes = {
         championName: PropTypes.string,
         championLevel: PropTypes.number,
         goldEarned: PropTypes.number,
-        totalMinionsKilled:  PropTypes.number,
+        totalMinionsKilled: PropTypes.number,
         item0: PropTypes.number,
         item1: PropTypes.number,
         item2: PropTypes.number,

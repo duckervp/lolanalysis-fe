@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Slide from '@mui/material/Slide';
 import Input from '@mui/material/Input';
@@ -10,7 +11,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 
 import { bgBlur } from 'src/theme/css';
-import { BASE_URL, ACCOUNT_ATTR } from 'src/app-config';
+import { BASE_URL } from 'src/app-config';
+import { setAccount, selectCurrentAccount } from 'src/redux/slice/accountSlice';
 
 import Iconify from 'src/components/iconify';
 
@@ -44,6 +46,10 @@ const StyledSearchbar = styled('div')(({ theme }) => ({
 export default function Searchbar() {
   const [open, setOpen] = useState(false);
 
+  const dispatch = useDispatch();
+
+  const currentAccount = useSelector(selectCurrentAccount);
+
   const [searchValue, updateSearchValue] = useState();
 
   const handleOpen = () => {
@@ -65,8 +71,7 @@ export default function Searchbar() {
     }
 
     const [gameName, tagLine] = searchParts;
-    if (localStorage.getItem(ACCOUNT_ATTR)) {
-      const currentAccount = JSON.parse(localStorage.getItem(ACCOUNT_ATTR));
+    if (currentAccount) {
       if (currentAccount.gameName !== gameName || currentAccount.tagLine !== tagLine) {
         callRiotAccountApi(gameName, tagLine);
       }
@@ -80,7 +85,7 @@ export default function Searchbar() {
     console.log("Call api");
     const url = `${BASE_URL}/riot/accounts?gameName=${gameName}&tagLine=${tagLine}`;
     const { data: result } = await axios.get(url);
-    localStorage.setItem("current-account", JSON.stringify(result.data));
+    dispatch(setAccount(result.data));
   };
 
   return (
@@ -98,7 +103,7 @@ export default function Searchbar() {
               autoFocus
               fullWidth
               disableUnderline
-              placeholder="Search…"
+              placeholder="Enter your RiotGames ID (Ex: GameName#TagLine)"
               startAdornment={
                 <InputAdornment position="start">
                   <Iconify
