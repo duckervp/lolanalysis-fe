@@ -26,8 +26,8 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
-  console.log("Appview rendered");
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid); 
+  console.log("Appview rendered ", currentAccountPuuid);
 
   const [matchIds, setMatchIds] = useState([]);
 
@@ -37,7 +37,6 @@ export default function AppView() {
     const fetchMatchHistory = async () => {
         if (currentAccountPuuid) {
           const matchIdsData = await callRiotMatchHistoryApi(currentAccountPuuid);
-          console.log(matchIdsData);
           setMatchIds(matchIdsData);
         }
     };

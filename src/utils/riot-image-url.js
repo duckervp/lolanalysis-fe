@@ -16,7 +16,6 @@ export const getChampionImageUrl = (champion) => {
 export const getItemImageUrl = (item) => {
     if (itemAsset.data[item]) {
         const {full, group} = itemAsset.data[item].image;
-        console.log(full, group);
         return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`
     }
     return undefined;

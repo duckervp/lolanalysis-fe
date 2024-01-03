@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
@@ -11,7 +12,6 @@ import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import PanoramaFishEyeTwoToneIcon from '@mui/icons-material/PanoramaFishEyeTwoTone';
 
-// import { fToNow } from 'src/utils/format-time';
 import { numberWithCommas } from 'src/utils/format-number';
 import { fDate, fDateTime, fToMinuteSecondString } from 'src/utils/format-time';
 import {
@@ -21,7 +21,7 @@ import {
   getSummonerImageUrl,
 } from 'src/utils/riot-image-url';
 
-import { ACCOUNT_ATTR } from 'src/app-config';
+import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -69,20 +69,20 @@ AppMatchHistory.propTypes = {
 // ----------------------------------------------------------------------
 
 function MatchItem({ match }) {
+  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
   const [currentUserChamp, setCurrentUserChamp] = useState();
 
   useEffect(() => {
     const getCurrentUserChampion = () => {
-      const currentAccount = JSON.parse(localStorage.getItem(ACCOUNT_ATTR));
       match.participantDetails.forEach((participantDetail, index) => {
-        if (participantDetail.puuid === currentAccount.puuid) {
+        if (participantDetail.puuid === currentAccountPuuid) {
           setCurrentUserChamp(participantDetail);
         }
       });
     };
 
     getCurrentUserChampion();
-  }, [match]);
+  }, [match, currentAccountPuuid]);
 
   return (
     <Stack direction="row" spacing={2}>
