@@ -26,27 +26,27 @@ import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
-import AppMatchDetailModal from './app-match-detail';
+// import AppMatchDetailModal from './app-match-detail';
 
 // ----------------------------------------------------------------------
 
 export default function AppMatchHistory({ title, subheader, list, ...other }) {
-  const [openMatchDetail, setOpenMatchDetail] = useState(false);
+  // const [openMatchDetail, setOpenMatchDetail] = useState(false);
 
-  const handleOpenMatchDetail = () => {
-    setOpenMatchDetail(true);
-  }
+  // const handleOpenMatchDetail = () => {
+  //   setOpenMatchDetail(true);
+  // }
 
   return (
-    <Box>
-      <AppMatchDetailModal open={openMatchDetail} setOpen={setOpenMatchDetail}/>
+    // <Box>
+    //   <AppMatchDetailModal open={openMatchDetail} setOpen={setOpenMatchDetail}/>
       <Card {...other}>
         <CardHeader title={title} subheader={subheader} />
 
         <Scrollbar>
           <Stack sx={{ p: 3, pr: 0 }}>
             {list.map((match) => (
-              <Box key={match.matchId} onClick={handleOpenMatchDetail}>
+              <Box key={match.matchId}>
                 <MatchItem match={match} />
                 <Divider variant="middle" sx={{ my: 2.5 }} />
               </Box>
@@ -66,7 +66,7 @@ export default function AppMatchHistory({ title, subheader, list, ...other }) {
           </Button>
         </Box>
       </Card>
-    </Box>
+    // </Box>
   );
 }
 
