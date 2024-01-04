@@ -17,7 +17,7 @@ export default function CustomModal({open, setOpen, children}) {
         onClose={handleClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <ModalContent sx={{ width: 400 }}>
+        <ModalContent sx={{ width: "90vw" }}>
           {children}
         </ModalContent>
       </Modal>
