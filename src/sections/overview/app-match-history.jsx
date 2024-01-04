@@ -26,37 +26,47 @@ import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
+import AppMatchDetailModal from './app-match-detail';
 
 // ----------------------------------------------------------------------
 
 export default function AppMatchHistory({ title, subheader, list, ...other }) {
+  const [openMatchDetail, setOpenMatchDetail] = useState(false);
+
+  const handleOpenMatchDetail = () => {
+    setOpenMatchDetail(true);
+  }
+
   return (
-    <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
+    <Box>
+      <AppMatchDetailModal open={openMatchDetail} setOpen={setOpenMatchDetail}/>
+      <Card {...other}>
+        <CardHeader title={title} subheader={subheader} />
 
-      <Scrollbar>
-        <Stack sx={{ p: 3, pr: 0 }}>
-          {list.map((match) => (
-            <Box key={match.matchId}>
-              <MatchItem match={match} />
-              <Divider variant="middle" sx={{ my: 2.5 }} />
-            </Box>
-          ))}
-        </Stack>
-      </Scrollbar>
+        <Scrollbar>
+          <Stack sx={{ p: 3, pr: 0 }}>
+            {list.map((match) => (
+              <Box key={match.matchId} onClick={handleOpenMatchDetail}>
+                <MatchItem match={match} />
+                <Divider variant="middle" sx={{ my: 2.5 }} />
+              </Box>
+            ))}
+          </Stack>
+        </Scrollbar>
 
-      <Divider sx={{ borderStyle: 'dashed' }} />
+        <Divider sx={{ borderStyle: 'dashed' }} />
 
-      <Box sx={{ p: 2, textAlign: 'right' }}>
-        <Button
-          size="small"
-          color="inherit"
-          endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
-        >
-          View all
-        </Button>
-      </Box>
-    </Card>
+        <Box sx={{ p: 2, textAlign: 'right' }}>
+          <Button
+            size="small"
+            color="inherit"
+            endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
+          >
+            View all
+          </Button>
+        </Box>
+      </Card>
+    </Box>
   );
 }
 
@@ -115,7 +125,10 @@ function MatchItem({ match }) {
       </Box>
       <Box sx={{ width: 5 }} />
       <Box>
-        <Typography variant="subtitle1" sx={currentUserChamp?.win ? {color: "green", height: 15} : {color: "red", height: 15}}>
+        <Typography
+          variant="subtitle1"
+          sx={currentUserChamp?.win ? { color: 'green', height: 15 } : { color: 'red', height: 15 }}
+        >
           {currentUserChamp?.win ? 'WIN' : 'LOST'}
         </Typography>
         <Typography variant="caption">{match?.gameMode}</Typography>
@@ -137,13 +150,13 @@ function MatchItem({ match }) {
       <Box sx={{ width: 40 }} />
       <Stack>
         <Stack direction="row" alignItems="center">
-          {getItemBox(currentUserChamp?.item0)}
-          {getItemBox(currentUserChamp?.item1)}
-          {getItemBox(currentUserChamp?.item2)}
-          {getItemBox(currentUserChamp?.item3)}
-          {getItemBox(currentUserChamp?.item4)}
-          {getItemBox(currentUserChamp?.item5)}
-          {getItemBox(currentUserChamp?.item6)}
+          <ItemBox itemId={currentUserChamp?.item0} />
+          <ItemBox itemId={currentUserChamp?.item1} />
+          <ItemBox itemId={currentUserChamp?.item2} />
+          <ItemBox itemId={currentUserChamp?.item3} />
+          <ItemBox itemId={currentUserChamp?.item4} />
+          <ItemBox itemId={currentUserChamp?.item5} />
+          <ItemBox itemId={currentUserChamp?.item6} />
         </Stack>
         <Stack
           direction="row"
@@ -173,45 +186,18 @@ function MatchItem({ match }) {
         </Stack>
       </Stack>
       <Stack alignItems="flex-start">
-        <Typography variant='body2'>{getMapName(match?.mapId)}</Typography>
+        <Typography variant="body2">{getMapName(match?.mapId)}</Typography>
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography variant='body2'>{fToMinuteSecondString(match?.gameDuration)}</Typography>
+          <Typography variant="body2">{fToMinuteSecondString(match?.gameDuration)}</Typography>
           <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
-          <Typography variant='body2'>{fDate(match?.gameCreation, "dd/MM/yyyy")}</Typography>
+          <Typography variant="body2">{fDate(match?.gameCreation, 'dd/MM/yyyy')}</Typography>
           <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
-          <Typography variant='body2'>{fDateTime(match?.gameCreation, "p")}</Typography>
+          <Typography variant="body2">{fDateTime(match?.gameCreation, 'p')}</Typography>
         </Stack>
       </Stack>
     </Stack>
   );
 }
-
-
-
-const getItemBox = (itemId) => {
-  const imageUrl = getItemImageUrl(itemId);
-  if (itemId === 0 || !imageUrl) {
-    return (
-      <Box
-        sx={{
-          display: 'inline-block',
-          width: 40,
-          height: 40,
-          border: '1px solid brown',
-          marginLeft: '-1px',
-        }}
-      />
-    );
-  }
-  return (
-    <Box
-      component="img"
-      alt={`item-${itemId}`}
-      src={imageUrl}
-      sx={{ width: 40, height: 40, flexShrink: 0, border: '1px solid brown', marginLeft: '-1px' }}
-    />
-  );
-};
 
 MatchItem.propTypes = {
   match: PropTypes.shape({
@@ -243,7 +229,45 @@ MatchItem.propTypes = {
         riotIdGameName: PropTypes.string,
         riotIdTagline: PropTypes.string,
         puuid: PropTypes.string,
+        teamId: PropTypes.number,
       })
     ),
   }),
+};
+
+// ----------------------------------------------------------------------
+
+const ItemBox = ({ itemId }) => {
+  const [imageUrl, setImageUrl] = useState();
+
+  useEffect(() => {
+    setImageUrl(getItemImageUrl(itemId));
+  }, [itemId]);
+
+  if (itemId === 0 || !imageUrl) {
+    return (
+      <Box
+        sx={{
+          display: 'inline-block',
+          width: 40,
+          height: 40,
+          border: '1px solid brown',
+          marginLeft: '-1px',
+        }}
+      />
+    );
+  }
+
+  return (
+    <Box
+      component="img"
+      alt={`item-${itemId}`}
+      src={imageUrl}
+      sx={{ width: 40, height: 40, flexShrink: 0, border: '1px solid brown', marginLeft: '-1px' }}
+    />
+  );
+};
+
+ItemBox.propTypes = {
+  itemId: PropTypes.number,
 };

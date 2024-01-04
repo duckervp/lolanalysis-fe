@@ -13,6 +13,7 @@ import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 import Iconify from 'src/components/iconify';
 
 import AppTasks from '../app-tasks';
+import { convertMatch } from '../utils';
 import AppNewsUpdate from '../app-news-update';
 import AppMatchHistory from '../app-match-history';
 import AppOrderTimeline from '../app-order-timeline';
@@ -26,8 +27,8 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
-  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid); 
-  console.log("Appview rendered ", currentAccountPuuid);
+  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
+  console.log('Appview rendered ', currentAccountPuuid);
 
   const [matchIds, setMatchIds] = useState([]);
 
@@ -35,75 +36,38 @@ export default function AppView() {
 
   useEffect(() => {
     const fetchMatchHistory = async () => {
-        if (currentAccountPuuid) {
-          const matchIdsData = await callRiotMatchHistoryApi(currentAccountPuuid);
-          setMatchIds(matchIdsData);
-        }
+      if (currentAccountPuuid) {
+        const matchIdsData = await callRiotMatchHistoryAPI(currentAccountPuuid);
+        setMatchIds(matchIdsData);
+      }
     };
     fetchMatchHistory();
   }, [currentAccountPuuid]);
 
   useEffect(() => {
     const fetchMatches = async () => {
-      const promises = [];
       if (matchIds.length > 0) {
-        matchIds.forEach((matchId) => promises.push(callRiotMatchApi(matchId)));
+        const matchesData = await callInternalMatchesAPI(matchIds);
+        setMatches(matchesData.map(matchData => convertMatch(matchData)));  
       }
-      Promise.all(promises).then((values) => {
-        setMatches(values);
-      });
     };
 
     fetchMatches();
   }, [matchIds]);
 
-  const callRiotMatchHistoryApi = async (puuid) => {
+  const callRiotMatchHistoryAPI = async (puuid) => {
     console.log('Call api');
     const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
     const { data: result } = await axios.get(url);
     return result.data;
   };
 
-  const callRiotMatchApi = async (matchId) => {
-    console.log('Call api');
-    const url = `${BASE_URL}/riot/lol/matches/${matchId}`;
+  const callInternalMatchesAPI = async (ids) => {
+    console.log('Call api fetch matches');
+    const queryString = `?matchIds=${ids.join(',')}`;
+    const url = `${BASE_URL}/matches/by-ids${queryString}`;
     const { data: result } = await axios.get(url);
-    const matchData = result.data;
-
-    const participantDetails = matchData.info.participants.map((participant) => ({
-      win: participant.win,
-      kills: participant.kills,
-      deaths: participant.deaths,
-      assists: participant.assists,
-      championName: participant.championName,
-      championLevel: participant.champLevel,
-      goldEarned: participant.goldEarned,
-      totalMinionsKilled: participant.totalMinionsKilled,
-      item0: participant.item0,
-      item1: participant.item1,
-      item2: participant.item2,
-      item3: participant.item3,
-      item4: participant.item4,
-      item5: participant.item5,
-      item6: participant.item6,
-      spellD: participant.summoner1Id,
-      spellF: participant.summoner2Id,
-      riotIdGameName:
-        participant.riotIdGameName || participant.riotIdName || participant.summonerName,
-      riotIdTagline: participant.riotIdTagline,
-      puuid: participant.puuid,
-    }));
-
-    const returnData = {
-      matchId: matchData.metadata.matchId,
-      gameCreation: matchData.info.gameCreation,
-      gameDuration: matchData.info.gameDuration,
-      gameMode: matchData.info.gameMode,
-      mapId: matchData.info.mapId,
-      participantDetails,
-    };
-
-    return returnData;
+    return result.data;
   };
 
   return (
