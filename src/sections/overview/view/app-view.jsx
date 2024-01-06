@@ -1,19 +1,12 @@
-import axios from 'axios';
 import { faker } from '@faker-js/faker';
-import { useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { BASE_URL } from 'src/app-config';
-import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
-
 import Iconify from 'src/components/iconify';
 
 import AppTasks from '../app-tasks';
-import { convertMatch } from '../utils';
 import AppNewsUpdate from '../app-news-update';
 import AppMatchHistory from '../app-match-history';
 import AppOrderTimeline from '../app-order-timeline';
@@ -27,49 +20,6 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
-  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
-  console.log('Appview rendered ', currentAccountPuuid);
-
-  const [matchIds, setMatchIds] = useState([]);
-
-  const [matches, setMatches] = useState([]);
-
-  useEffect(() => {
-    const fetchMatchHistory = async () => {
-      if (currentAccountPuuid) {
-        const matchIdsData = await callRiotMatchHistoryAPI(currentAccountPuuid);
-        setMatchIds(matchIdsData);
-      }
-    };
-    fetchMatchHistory();
-  }, [currentAccountPuuid]);
-
-  useEffect(() => {
-    const fetchMatches = async () => {
-      if (matchIds.length > 0) {
-        const matchesData = await callInternalMatchesAPI(matchIds);
-        setMatches(matchesData.map(matchData => convertMatch(matchData)));  
-      }
-    };
-
-    fetchMatches();
-  }, [matchIds]);
-
-  const callRiotMatchHistoryAPI = async (puuid) => {
-    console.log('Call api');
-    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
-    const { data: result } = await axios.get(url);
-    return result.data;
-  };
-
-  const callInternalMatchesAPI = async (ids) => {
-    console.log('Call api fetch matches');
-    const queryString = `?matchIds=${ids.join(',')}`;
-    const url = `${BASE_URL}/matches/by-ids${queryString}`;
-    const { data: result } = await axios.get(url);
-    return result.data;
-  };
-
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -114,8 +64,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={12} lg={12}>
-          {console.log('matches', matches)}
-          <AppMatchHistory title="Match History" list={matches} />
+          <AppMatchHistory title="Match History" />
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>

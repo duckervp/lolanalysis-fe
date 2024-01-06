@@ -1,3 +1,4 @@
+import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
@@ -16,21 +17,73 @@ import { numberWithCommas } from 'src/utils/format-number';
 import { fDate, fDateTime, fToMinuteSecondString } from 'src/utils/format-time';
 import {
   getMapName,
+  getMapIconUrl,
   getItemImageUrl,
   getChampionImageUrl,
   getSummonerImageUrl,
   getRunesIconImageUrl,
 } from 'src/utils/riot-image-url';
 
+import { BASE_URL } from 'src/app-config';
 import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
+import Loading from 'src/components/loading/loading';
 import CustomModal from 'src/components/modal/modal';
+
+import { convertMatch } from './utils';
 
 // ----------------------------------------------------------------------
 
-export default function AppMatchHistory({ title, subheader, list, ...other }) {
+export default function AppMatchHistory({ title, subheader, ...other }) {
+  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
+
+  const [loading, setLoading] = useState(false);
+
+  const [matchIds, setMatchIds] = useState([]);
+
+  const [matches, setMatches] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchMatchHistory = async () => {
+      if (currentAccountPuuid) {
+        const matchIdsData = await callRiotMatchHistoryAPI(currentAccountPuuid);
+        setMatchIds(matchIdsData);
+      }
+    };
+    fetchMatchHistory();
+  }, [currentAccountPuuid]);
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      if (matchIds.length > 0) {
+        const matchesData = await callInternalMatchesAPI(matchIds);
+        console.log(matchesData);
+        setMatches(matchesData.map((matchData) => convertMatch(matchData)));
+      }
+    };
+
+    fetchMatches();
+    setLoading(false);
+  }, [matchIds]);
+
+  const callRiotMatchHistoryAPI = async (puuid) => {
+    console.log('Call api');
+    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
+    const { data: result } = await axios.get(url);
+    return result.data;
+  };
+
+  const callInternalMatchesAPI = async (ids) => {
+    console.log('Call api fetch matches');
+    const queryString = `?matchIds=${ids.join(',')}`;
+    const url = `${BASE_URL}/matches/by-ids${queryString}`;
+    const { data: result } = await axios.get(url);
+    return result.data;
+  };
+
   const [openMatchDetail, setOpenMatchDetail] = useState(false);
 
   const [selectedMatch, setSelectedMatch] = useState({});
@@ -39,6 +92,10 @@ export default function AppMatchHistory({ title, subheader, list, ...other }) {
     setOpenMatchDetail(true);
     setSelectedMatch(match);
   };
+
+  if (loading) {
+    return <Loading type="linear" variant="buffer" />;
+  }
 
   return (
     <Box>
@@ -50,10 +107,10 @@ export default function AppMatchHistory({ title, subheader, list, ...other }) {
 
         <Scrollbar>
           <Stack sx={{ p: 3, pr: 0 }}>
-            {list.map((match) => (
+            {matches?.map((match) => (
               <Box key={match.matchId} onClick={() => handleOpenMatchDetail(match)}>
                 <MatchItem match={match} />
-                <Divider variant="middle" sx={{ my: 2.5 }} />
+                <Divider sx={{ my: 2.5 }} />
               </Box>
             ))}
           </Stack>
@@ -78,7 +135,6 @@ export default function AppMatchHistory({ title, subheader, list, ...other }) {
 AppMatchHistory.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
-  list: PropTypes.array.isRequired,
 };
 
 // ----------------------------------------------------------------------
@@ -102,6 +158,26 @@ RuneIcon.propTypes = {
 };
 
 // ----------------------------------------------------------------------
+function MapIcon({ mapId, sx }) {
+  const [mapIcon, setMapIcon] = useState();
+
+  useEffect(() => {
+    setMapIcon(getMapIconUrl(mapId));
+  }, [mapId]);
+
+  if (!mapIcon) {
+    return <Box />;
+  }
+
+  return <Box component="img" alt={`mapId-${mapId}`} src={mapIcon} sx={sx} />;
+}
+
+MapIcon.propTypes = {
+  mapId: PropTypes.number,
+  sx: PropTypes.object,
+};
+
+// ----------------------------------------------------------------------
 function ChampAvatar({ champName, sx }) {
   return <Box component="img" alt={champName} src={getChampionImageUrl(champName)} sx={sx} />;
 }
@@ -115,11 +191,12 @@ ChampAvatar.propTypes = {
 
 function MatchItem({ match }) {
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
+
   const [currentUserChamp, setCurrentUserChamp] = useState();
 
   useEffect(() => {
     const getCurrentUserChampion = () => {
-      match.participantDetails.forEach((participantDetail, index) => {
+      match.participantDetails.forEach((participantDetail) => {
         if (participantDetail.puuid === currentAccountPuuid) {
           setCurrentUserChamp(participantDetail);
         }
@@ -134,7 +211,7 @@ function MatchItem({ match }) {
       <Box sx={{ position: 'relative' }}>
         <ChampAvatar
           champName={currentUserChamp?.championName}
-          sx={{ width: 70, height: 70, borderRadius: 5, flexShrink: 0, border: '2px solid brown' }}
+          sx={{ width: 70, height: 70, borderRadius: 5, flexShrink: 0, border: '2px solid SlateGrey' }}
         />
         <Box
           sx={{
@@ -147,7 +224,7 @@ function MatchItem({ match }) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            border: '2px solid brown',
+            border: '2px solid SlateGrey',
             position: 'absolute',
             top: 45,
             left: 50,
@@ -183,7 +260,7 @@ function MatchItem({ match }) {
           justifyContent="space-between"
         >
           <KDA
-            sx={{ height: 18, width: '100px' }}
+            height={18}
             kills={currentUserChamp?.kills}
             deaths={currentUserChamp?.deaths}
             assists={currentUserChamp?.assists}
@@ -204,13 +281,7 @@ function MatchItem({ match }) {
       </Stack>
       <Stack alignItems="flex-start">
         <Typography variant="body2">{getMapName(match?.mapId)}</Typography>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography variant="body2">{fToMinuteSecondString(match?.gameDuration)}</Typography>
-          <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
-          <Typography variant="body2">{fDate(match?.gameCreation, 'dd/MM/yyyy')}</Typography>
-          <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
-          <Typography variant="body2">{fDateTime(match?.gameCreation, 'p')}</Typography>
-        </Stack>
+        <MatchTimeDetail gameCreation={match?.gameCreation} gameDuration={match?.gameDuration} />
       </Stack>
     </Stack>
   );
@@ -249,6 +320,25 @@ MatchItem.propTypes = {
 
 // ----------------------------------------------------------------------
 
+function MatchTimeDetail({ gameCreation, gameDuration }) {
+  return (
+    <Stack direction="row" alignItems="center" spacing={1}>
+      <Typography variant="body2">{fToMinuteSecondString(gameDuration)}</Typography>
+      <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
+      <Typography variant="body2">{fDate(gameCreation, 'dd/MM/yyyy')}</Typography>
+      <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
+      <Typography variant="body2">{fDateTime(gameCreation, 'p')}</Typography>
+    </Stack>
+  );
+}
+
+MatchTimeDetail.propTypes = {
+  gameCreation: PropTypes.number,
+  gameDuration: PropTypes.number,
+};
+
+// ----------------------------------------------------------------------
+
 function Spells({ spellD, spellF, width, height, direction }) {
   const style = {
     width,
@@ -256,7 +346,7 @@ function Spells({ spellD, spellF, width, height, direction }) {
     flexShrink: 0,
   };
   return (
-    <Stack sx={{ border: '1px solid brown', mt: 0.5 }} direction={direction}>
+    <Stack sx={{ border: '1px solid SlateGrey', mt: 0.5 }} direction={direction}>
       <Box component="img" alt="Spell D" src={getSummonerImageUrl(spellD)} sx={style} />
       <Box component="img" alt="Spell F" src={getSummonerImageUrl(spellF)} sx={style} />
     </Stack>
@@ -273,22 +363,47 @@ Spells.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function KDA({ kills, deaths, assists }) {
+function KDA({ kills, deaths, assists, height }) {
   return (
     <Stack direction="row">
-      <Typography variant="subtitle1" sx={{ width: 25, textAlign: 'center' }}>
+      <Typography
+        variant="subtitle1"
+        sx={
+          height ? { height, width: 25, textAlign: 'center' } : { width: 25, textAlign: 'center' }
+        }
+      >
         {kills}
       </Typography>
-      <Typography variant="subtitle1" sx={{ width: 15, textAlign: 'center' }}>
+      <Typography
+        variant="subtitle1"
+        sx={
+          height ? { height, width: 15, textAlign: 'center' } : { width: 15, textAlign: 'center' }
+        }
+      >
         /
       </Typography>
-      <Typography variant="subtitle1" sx={{ width: 25, textAlign: 'center' }}>
+      <Typography
+        variant="subtitle1"
+        sx={
+          height ? { height, width: 25, textAlign: 'center' } : { width: 25, textAlign: 'center' }
+        }
+      >
         {deaths}
       </Typography>
-      <Typography variant="subtitle1" sx={{ width: 15, textAlign: 'center' }}>
+      <Typography
+        variant="subtitle1"
+        sx={
+          height ? { height, width: 15, textAlign: 'center' } : { width: 15, textAlign: 'center' }
+        }
+      >
         /
       </Typography>
-      <Typography variant="subtitle1" sx={{ width: 25, textAlign: 'center' }}>
+      <Typography
+        variant="subtitle1"
+        sx={
+          height ? { height, width: 25, textAlign: 'center' } : { width: 25, textAlign: 'center' }
+        }
+      >
         {assists}
       </Typography>
     </Stack>
@@ -299,6 +414,7 @@ KDA.propTypes = {
   kills: PropTypes.number,
   deaths: PropTypes.number,
   assists: PropTypes.number,
+  height: PropTypes.number,
 };
 
 // ----------------------------------------------------------------------
@@ -337,7 +453,12 @@ function ItemList({ items, width, height }) {
   return (
     <Stack direction="row" alignItems="center">
       {items?.map((item) => (
-        <ItemBox key={item} itemId={item} width={width} height={height} />
+        <ItemBox
+          key={`item-${item}-${Math.random()}`}
+          itemId={item}
+          width={width}
+          height={height}
+        />
       ))}
     </Stack>
   );
@@ -362,7 +483,7 @@ const ItemBox = ({ itemId, width, height }) => {
     display: 'inline-block',
     width,
     height,
-    border: '1px solid brown',
+    border: '1px solid SlateGrey',
     marginLeft: '-1px',
   };
 
@@ -370,7 +491,7 @@ const ItemBox = ({ itemId, width, height }) => {
     width,
     height,
     flexShrink: 0,
-    border: '1px solid brown',
+    border: '1px solid SlateGrey',
     marginLeft: '-1px',
   };
 
@@ -390,30 +511,36 @@ ItemBox.propTypes = {
 // ----------------------------------------------------------------------
 
 function DetailParticipantHeader({ teamName, teamGolds, teamKills, teamDeaths, teamAssists }) {
+  const iconSize = 15;
   return (
-    <Stack direction="row" alignItems="center" spacing={1} py={0.5} justifyContent="space-between">
-      <Stack sx={{ width: 405 }} direction="row" justifyContent="space-between">
-        <Typography variant="">{teamName}</Typography>
-        <Stack direction="row" alignItems="center">
-          <KDA kills={teamKills} deaths={teamDeaths} assists={teamAssists} />
-          <AttackIcon sx={{ width: 12.5, height: 12.5 }} />
+    <Stack direction="row" alignItems="center" spacing={1} py={2} justifyContent="space-between">
+      <Stack sx={{ width: 366.27 }} direction="row" justifyContent="space-between">
+        <Typography variant="subtitle1" color={teamName.includes('1') ? 'blue' : 'red'}>
+          {teamName}
+        </Typography>
+        <Stack direction="row" alignItems="center" color={teamName.includes('1') ? 'blue' : 'red'}>
+          <KDA kills={teamKills} deaths={teamDeaths} assists={teamAssists} height={22} />
+          <Box width={5} />
+          <AttackIcon sx={{ width: iconSize, height: iconSize }} />
         </Stack>
       </Stack>
-      <Stack direction="row" alignItems="center" sx={{ width: 280 }} textAlign="center">
-        <Typography variant="subtitle2">{teamGolds}</Typography>
-        <GoldIcon sx={{ height: 12.5 }} />
+      <Stack direction="row" alignItems="center" sx={{ width: 273 }} justifyContent="center">
+        <Typography variant="subtitle1" mr={0.5} color="GrayText">
+          {numberWithCommas(teamGolds)}
+        </Typography>
+        <GoldIcon sx={{ height: iconSize }} />
       </Stack>
       <Box width={20} />
       <Stack direction="row" alignItems="center" spacing={1}>
-        <Box width={100} textAlign="center">
-          <AttackIcon sx={{ width: 12.5, height: 12.5 }} />
-        </Box>
-        <Box width={100} textAlign="center">
-          <MinionsIcon sx={{ width: 12.5, height: 12.5 }} />
-        </Box>
-        <Box width={100} textAlign="center">
-          <GoldIcon sx={{ height: 12.5 }} />
-        </Box>
+        <Stack width={100} alignItems="center" justifyContent="center">
+          <AttackIcon sx={{ width: iconSize, height: iconSize }} />
+        </Stack>
+        <Stack width={100} alignItems="center" justifyContent="center">
+          <MinionsIcon sx={{ width: iconSize, height: iconSize }} />
+        </Stack>
+        <Stack width={100} alignItems="center" justifyContent="center">
+          <GoldIcon sx={{ height: iconSize }} />
+        </Stack>
       </Stack>
     </Stack>
   );
@@ -430,12 +557,14 @@ DetailParticipantHeader.propTypes = {
 // ----------------------------------------------------------------------
 
 function DetailParticipantItem({ participant }) {
+  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
+
   return (
     <Stack direction="row" alignItems="center" spacing={1} py={0.5} justifyContent="space-between">
       <Stack direction="row" alignItems="center" spacing={1}>
         <RuneIcon
           runeId={participant?.primaryRuneId}
-          sx={{ width: 40, height: 40, background: 'gray', borderRadius: 5 }}
+          sx={{ width: 40, height: 40, background: 'gray', borderRadius: .5 }}
         />
         <Spells
           spellD={participant?.spellD}
@@ -444,27 +573,52 @@ function DetailParticipantItem({ participant }) {
           height={20}
           direction="column"
         />
-        <Typography variant="subtitle1">{participant?.championLevel}</Typography>
+        <Typography
+          variant="subtitle1"
+          color={getDetailParticipantColor(participant, currentAccountPuuid)}
+        >
+          {participant?.championLevel}
+        </Typography>
         <ChampAvatar
           champName={participant?.championName}
-          sx={{ width: 45, height: 45, borderRadius: 5, flexShrink: 0, border: '2px solid brown' }}
+          sx={{ width: 45, height: 45, borderRadius: 5, flexShrink: 0, border: '2px solid SlateGrey' }}
         />
-        <Typography width="250px" variant="body2">
+        <Typography
+          width="250px"
+          variant="body2"
+          color={getDetailParticipantColor(participant, currentAccountPuuid)}
+        >
           {participant?.riotIdGameName}
         </Typography>
       </Stack>
       <ItemList items={participant?.items} width={40} height={40} />
       <Box width={20} />
-      <Stack direction="row" alignItems="center" spacing={1}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        color={getDetailParticipantColor(participant, currentAccountPuuid)}
+      >
         <KDA
           kills={participant?.kills}
           deaths={participant?.deaths}
           assists={participant?.assists}
+          height={14}
         />
-        <Typography variant="subtitle1" width={100} textAlign="center">
+        <Typography
+          variant="subtitle1"
+          width={100}
+          textAlign="center"
+          color={getDetailParticipantColor(participant, currentAccountPuuid)}
+        >
           {participant?.totalMinionsKilled}
         </Typography>
-        <Typography variant="subtitle1" width={100} textAlign="center">
+        <Typography
+          variant="subtitle1"
+          width={100}
+          textAlign="center"
+          color={getDetailParticipantColor(participant, currentAccountPuuid)}
+        >
           {numberWithCommas(participant?.goldEarned)}
         </Typography>
       </Stack>
@@ -493,9 +647,14 @@ DetailParticipantItem.propTypes = {
   }),
 };
 
+const getDetailParticipantColor = (participant, currentAccountPuuid) =>
+  participant.puuid === currentAccountPuuid ? 'GoldenRod' : 'black';
+
 // ----------------------------------------------------------------------
 
 function MatchDetail({ match }) {
+  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
+
   const [blueTeamParticipants, setBlueTeamParticipants] = useState([]);
 
   const [redTeamParticipants, setRedTeamParticipants] = useState([]);
@@ -503,22 +662,55 @@ function MatchDetail({ match }) {
   useEffect(() => {
     const blueTeamMembers = [];
     const redTeamMembers = [];
+
+    let currentAccountTeamId = 0;
+    let currentAccountParticipant = {};
     match?.participantDetails?.forEach((participant) => {
-      if (participant.win) {
-        blueTeamMembers.push(participant);
-      } else {
-        redTeamMembers.push(participant);
+      if (participant.puuid === currentAccountPuuid) {
+        currentAccountTeamId = participant.teamId;
+        currentAccountParticipant = participant;
       }
     });
 
-    setBlueTeamParticipants(blueTeamMembers);
-    setRedTeamParticipants(redTeamMembers);
-  }, [match]);
+    if (currentAccountTeamId !== 0) {
+      match?.participantDetails?.forEach((participant) => {
+        if (participant.teamId === currentAccountTeamId) {
+          if (participant.puuid !== currentAccountPuuid) {
+            blueTeamMembers.push(participant);
+          }
+        } else {
+          redTeamMembers.push(participant);
+        }
+      });
+
+      blueTeamMembers.unshift(currentAccountParticipant);
+
+      setBlueTeamParticipants(blueTeamMembers);
+      setRedTeamParticipants(redTeamMembers);
+    }
+  }, [match, currentAccountPuuid]);
 
   return (
     <Card>
-      <Scrollbar>
-        <Stack sx={{ padding: 4 }}>
+      <Scrollbar sx={{ padding: 4 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <MapIcon mapId={match?.mapId} sx={{ width: 65, height: 65, borderRadius: 0.5 }} />
+          <Stack>
+            <Typography variant="h3">WIN</Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="body2">{getMapName(match?.mapId)}</Typography>
+              <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
+              <Typography variant="caption">{match?.gameMode}</Typography>
+              <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
+              <MatchTimeDetail
+                gameCreation={match?.gameCreation}
+                gameDuration={match?.gameDuration}
+              />
+            </Stack>
+          </Stack>
+        </Stack>
+        <Divider sx={{ my: 2 }} />
+        <Stack>
           <TeamParticipants team="TEAM 1" participants={blueTeamParticipants} />
           <TeamParticipants team="TEAM 2" participants={redTeamParticipants} />
         </Stack>
@@ -565,11 +757,24 @@ function TeamParticipants({ team, participants }) {
   const [teamGolds, setTeamGolds] = useState(0);
 
   useEffect(() => {
-    const kills = participants.reduce((p1, p2) => p1.kills + p2.kills);
-    const kills = participants.reduce((p1, p2) => p1.kills + p2.kills);
-    const kills = participants.reduce((p1, p2) => p1.kills + p2.kills);
-    const kills = participants.reduce((p1, p2) => p1.kills + p2.kills);
+    if (participants.length > 0) {
+      let kills = 0;
+      let deaths = 0;
+      let assists = 0;
+      let goldEarned = 0;
+      participants.forEach((participant) => {
+        kills += participant.kills;
+        deaths += participant.deaths;
+        assists += participant.assists;
+        goldEarned += participant.goldEarned;
+      });
+      setTeamKills(kills);
+      setTeamDeaths(deaths);
+      setTeamAssists(assists);
+      setTeamGolds(goldEarned);
+    }
   }, [participants]);
+
   return (
     <Stack>
       <DetailParticipantHeader

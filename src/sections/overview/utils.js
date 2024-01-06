@@ -40,8 +40,6 @@ export const convertMatch = (matchData) => {
 
 const getParticipantRuneId = (participant) => {
   const styles = participant?.perks?.styles;
-  console.log(participant?.perks);
-  console.log(styles);
   let runeId = 0;
   styles?.forEach((element) => {
     if (element.description === 'primaryStyle') {

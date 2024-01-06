@@ -7,6 +7,9 @@ import runesReforgedAsset from 'src/assets/runesReforged.json';
 import { DDRAGON_URL, LOL_CURRENT_VERSION } from 'src/app-config';
 
 export const getChampionImageUrl = (champion) => {
+  if (champion === "FiddleSticks") {
+    champion = "Fiddlesticks";
+  }
   if (championAsset.data[champion]) {
     const { full, group } = championAsset.data[champion].image;
     return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
@@ -49,6 +52,14 @@ export const getProfileIconImageUrl = (profileIconId) => {
 export const getMapName = (mapId) => {
   if (mapAsset.data[mapId]) {
     return mapAsset.data[mapId].MapName;
+  }
+  return undefined;
+};
+
+export const getMapIconUrl = (mapId) => {
+  if (mapAsset.data[mapId]) {
+    const { full, group } =  mapAsset.data[mapId].image;
+    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
   }
   return undefined;
 };
