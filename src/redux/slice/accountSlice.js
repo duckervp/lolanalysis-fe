@@ -27,4 +27,6 @@ export const selectCurrentAccount = (state) => state?.account;
 
 export const selectCurrentAccountPuuid = (state) => state?.account?.puuid;
 
+export const selectCurrentAccountName = (state) => state?.account?.gameName;
+
 export default accountSlice.reducer;

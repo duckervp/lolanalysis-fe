@@ -1,14 +1,8 @@
-import axios from 'axios';
 import { faker } from '@faker-js/faker';
-import { useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
-
-import { BASE_URL } from 'src/app-config';
-import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 
 import Iconify from 'src/components/iconify';
 
@@ -26,86 +20,6 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
-  const currentAccountPuuid = useSelector(selectCurrentAccountPuuid); 
-  console.log("Appview rendered ", currentAccountPuuid);
-
-  const [matchIds, setMatchIds] = useState([]);
-
-  const [matches, setMatches] = useState([]);
-
-  useEffect(() => {
-    const fetchMatchHistory = async () => {
-        if (currentAccountPuuid) {
-          const matchIdsData = await callRiotMatchHistoryApi(currentAccountPuuid);
-          setMatchIds(matchIdsData);
-        }
-    };
-    fetchMatchHistory();
-  }, [currentAccountPuuid]);
-
-  useEffect(() => {
-    const fetchMatches = async () => {
-      const promises = [];
-      if (matchIds.length > 0) {
-        matchIds.forEach((matchId) => promises.push(callRiotMatchApi(matchId)));
-      }
-      Promise.all(promises).then((values) => {
-        setMatches(values);
-      });
-    };
-
-    fetchMatches();
-  }, [matchIds]);
-
-  const callRiotMatchHistoryApi = async (puuid) => {
-    console.log('Call api');
-    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
-    const { data: result } = await axios.get(url);
-    return result.data;
-  };
-
-  const callRiotMatchApi = async (matchId) => {
-    console.log('Call api');
-    const url = `${BASE_URL}/riot/lol/matches/${matchId}`;
-    const { data: result } = await axios.get(url);
-    const matchData = result.data;
-
-    const participantDetails = matchData.info.participants.map((participant) => ({
-      win: participant.win,
-      kills: participant.kills,
-      deaths: participant.deaths,
-      assists: participant.assists,
-      championName: participant.championName,
-      championLevel: participant.champLevel,
-      goldEarned: participant.goldEarned,
-      totalMinionsKilled: participant.totalMinionsKilled,
-      item0: participant.item0,
-      item1: participant.item1,
-      item2: participant.item2,
-      item3: participant.item3,
-      item4: participant.item4,
-      item5: participant.item5,
-      item6: participant.item6,
-      spellD: participant.summoner1Id,
-      spellF: participant.summoner2Id,
-      riotIdGameName:
-        participant.riotIdGameName || participant.riotIdName || participant.summonerName,
-      riotIdTagline: participant.riotIdTagline,
-      puuid: participant.puuid,
-    }));
-
-    const returnData = {
-      matchId: matchData.metadata.matchId,
-      gameCreation: matchData.info.gameCreation,
-      gameDuration: matchData.info.gameDuration,
-      gameMode: matchData.info.gameMode,
-      mapId: matchData.info.mapId,
-      participantDetails,
-    };
-
-    return returnData;
-  };
-
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -150,8 +64,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={12} lg={12}>
-          {console.log('matches', matches)}
-          <AppMatchHistory title="Match History" list={matches} />
+          <AppMatchHistory title="Match History" />
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>
