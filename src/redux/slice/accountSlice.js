@@ -17,11 +17,16 @@ export const accountSlice = createSlice({
         state[key] = payload[key];
       });
     },
+    logout: state => {
+      Object.keys(state).forEach((key) => {
+        state[key] = '';
+      });
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setAccount } = accountSlice.actions;
+export const { setAccount, logout } = accountSlice.actions;
 
 export const selectCurrentAccount = (state) => state?.account;
 

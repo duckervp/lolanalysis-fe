@@ -82,7 +82,6 @@ export default function Searchbar() {
   };
 
   const callRiotAccountApi = async (gameName, tagLine) => {
-    console.log("Call api");
     const url = `${BASE_URL}/riot/accounts?gameName=${gameName}&tagLine=${tagLine}`;
     const { data: result } = await axios.get(url);
     dispatch(setAccount(result.data));

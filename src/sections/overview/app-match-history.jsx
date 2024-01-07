@@ -46,21 +46,23 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
   const [matches, setMatches] = useState([]);
 
   useEffect(() => {
-    setLoading(true);
     const fetchMatchHistory = async () => {
-      if (currentAccountPuuid) {
-        const matchIdsData = await callRiotMatchHistoryAPI(currentAccountPuuid);
-        setMatchIds(matchIdsData);
-      }
+      const matchIdsData = await callRiotMatchHistoryAPI(currentAccountPuuid);
+      setMatchIds(matchIdsData);
     };
-    fetchMatchHistory();
+    if (currentAccountPuuid) {
+      setLoading(true);
+      fetchMatchHistory();
+    } else {
+      setMatchIds([]);
+      setMatches([]);
+    }
   }, [currentAccountPuuid]);
 
   useEffect(() => {
     const fetchMatches = async () => {
       if (matchIds.length > 0) {
         const matchesData = await callInternalMatchesAPI(matchIds);
-        console.log(matchesData);
         setMatches(matchesData.map((matchData) => convertMatch(matchData)));
       }
     };
@@ -70,17 +72,16 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
   }, [matchIds]);
 
   const callRiotMatchHistoryAPI = async (puuid) => {
-    console.log('Call api');
     const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
     const { data: result } = await axios.get(url);
     return result.data;
   };
 
   const callInternalMatchesAPI = async (ids) => {
-    console.log('Call api fetch matches');
     const queryString = `?matchIds=${ids.join(',')}`;
     const url = `${BASE_URL}/matches/by-ids${queryString}`;
     const { data: result } = await axios.get(url);
+    console.log(result);
     return result.data;
   };
 
@@ -94,7 +95,7 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
   };
 
   if (loading) {
-    return <Loading type="linear" variant="buffer" />;
+    return <Loading type="linear" variant="indeterminate" />;
   }
 
   return (
@@ -145,8 +146,8 @@ function RuneIcon({ runeId, sx }) {
     setRuneIcon(getRunesIconImageUrl(runeId));
   }, [runeId]);
 
-  if (!runeIcon) {
-    return <Box />;
+  if (!runeId || !runeIcon) {
+    return <Loading type='circle' variant='indeterminate' />;
   }
 
   return <Box component="img" alt={`runeId-${runeId}`} src={runeIcon} sx={sx} />;
@@ -166,7 +167,7 @@ function MapIcon({ mapId, sx }) {
   }, [mapId]);
 
   if (!mapIcon) {
-    return <Box />;
+    return  <Loading type='circle' variant='indeterminate' />;
   }
 
   return <Box component="img" alt={`mapId-${mapId}`} src={mapIcon} sx={sx} />;
@@ -211,7 +212,13 @@ function MatchItem({ match }) {
       <Box sx={{ position: 'relative' }}>
         <ChampAvatar
           champName={currentUserChamp?.championName}
-          sx={{ width: 70, height: 70, borderRadius: 5, flexShrink: 0, border: '2px solid SlateGrey' }}
+          sx={{
+            width: 70,
+            height: 70,
+            borderRadius: 5,
+            flexShrink: 0,
+            border: '2px solid SlateGrey',
+          }}
         />
         <Box
           sx={{
@@ -564,7 +571,7 @@ function DetailParticipantItem({ participant }) {
       <Stack direction="row" alignItems="center" spacing={1}>
         <RuneIcon
           runeId={participant?.primaryRuneId}
-          sx={{ width: 40, height: 40, background: 'gray', borderRadius: .5 }}
+          sx={{ width: 40, height: 40, background: 'gray', borderRadius: 0.5 }}
         />
         <Spells
           spellD={participant?.spellD}
@@ -581,7 +588,13 @@ function DetailParticipantItem({ participant }) {
         </Typography>
         <ChampAvatar
           champName={participant?.championName}
-          sx={{ width: 45, height: 45, borderRadius: 5, flexShrink: 0, border: '2px solid SlateGrey' }}
+          sx={{
+            width: 45,
+            height: 45,
+            borderRadius: 5,
+            flexShrink: 0,
+            border: '2px solid SlateGrey',
+          }}
         />
         <Typography
           width="250px"
