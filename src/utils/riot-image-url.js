@@ -57,11 +57,20 @@ export const getMapName = (mapId) => {
 };
 
 export const getMapIconUrl = (mapId) => {
-  if (mapAsset.data[mapId]) {
+  if (mapId === 11) {
+    return "src/assets/icon_summoner's_rift.png";
+  }
+  
+  if (mapId === 12) {
+    return "src/assets/icon_howling_abyss.png";
+  }
+  
+  if (mapId === 22 && mapAsset.data[mapId]) {
     const { full, group } =  mapAsset.data[mapId].image;
     return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
   }
-  return undefined;
+
+  return "src/assets/icon_featured_game_mode.png";
 };
 
 export const getRunesIconImageUrl = (runeId) => {

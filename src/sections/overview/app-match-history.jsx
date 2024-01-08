@@ -707,7 +707,7 @@ function MatchDetail({ match }) {
     <Card>
       <Scrollbar sx={{ padding: 4 }}>
         <Stack direction="row" spacing={2} alignItems="center">
-          <MapIcon mapId={match?.mapId} sx={{ width: 65, height: 65, borderRadius: 0.5 }} />
+          <MapIcon mapId={match?.mapId} sx={{ width: 65, height: 65, borderRadius: 0.5, backgroundColor: "lightblue" }} />
           <Stack>
             <Typography variant="h3">WIN</Typography>
             <Stack direction="row" alignItems="center" spacing={1}>
