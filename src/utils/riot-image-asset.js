@@ -3,7 +3,7 @@ import itemAsset from 'src/assets/item.json';
 import championAsset from 'src/assets/champion.json';
 import summonerAsset from 'src/assets/summoner.json';
 import profileIconAsset from 'src/assets/profileicon.json';
-import runesReforgedAsset from 'src/assets/runesReforged.json';
+import runesReforgedAsset from 'src/assets/runesreforged.json';
 import { DDRAGON_URL, LOL_CURRENT_VERSION } from 'src/app-config';
 
 export const getChampionImageUrl = (champion) => {
