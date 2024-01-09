@@ -7,14 +7,27 @@ import runesReforgedAsset from 'src/assets/runesreforged.json';
 import { DDRAGON_URL, LOL_CURRENT_VERSION } from 'src/app-config';
 
 export const getChampionImageUrl = (champion) => {
-  if (champion === "FiddleSticks") {
-    champion = "Fiddlesticks";
+  if (champion === 'FiddleSticks') {
+    champion = 'Fiddlesticks';
   }
   if (championAsset.data[champion]) {
     const { full, group } = championAsset.data[champion].image;
     return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
   }
   return undefined;
+};
+
+export const getChampionImageByChampionId = (championId) => {
+  let url = '';
+
+  Object.values(championAsset.data).forEach((champion) => {
+    if (champion.key === championId) {
+      const { full, group } = championAsset.data[champion].image;
+      url = `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
+    }
+  });
+
+  return url === '' ? undefined : url;
 };
 
 export const getItemImageUrl = (item) => {
@@ -60,28 +73,27 @@ export const getMapIconUrl = (mapId) => {
   if (mapId === 11) {
     return "src/assets/icon_summoner's_rift.png";
   }
-  
+
   if (mapId === 12) {
-    return "src/assets/icon_howling_abyss.png";
+    return 'src/assets/icon_howling_abyss.png';
   }
-  
+
   if (mapId === 22 && mapAsset.data[mapId]) {
-    const { full, group } =  mapAsset.data[mapId].image;
+    const { full, group } = mapAsset.data[mapId].image;
     return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
   }
 
-  return "src/assets/icon_featured_game_mode.png";
+  return 'src/assets/icon_featured_game_mode.png';
 };
 
 export const getRunesIconImageUrl = (runeId) => {
-
   let iconImageUrl = '';
 
   runesReforgedAsset?.forEach((item) => {
     item.slots[0]?.runes?.forEach((rune) => {
-        if (rune?.id === runeId) {
-            iconImageUrl = `${DDRAGON_URL}/img/${rune?.icon}`;
-        }
+      if (rune?.id === runeId) {
+        iconImageUrl = `${DDRAGON_URL}/img/${rune?.icon}`;
+      }
     });
   });
 

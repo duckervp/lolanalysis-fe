@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 
 import { getSummonerImageUrl } from 'src/utils/riot-image-asset';
 
-import ImageIcon from './image-icon';
+import ImageIcon from '../image-icon';
 
 export default function Spells({ spellD, spellF, width, height, direction }) {
   const style = {
