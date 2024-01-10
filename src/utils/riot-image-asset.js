@@ -18,11 +18,13 @@ export const getChampionImageUrl = (champion) => {
 };
 
 export const getChampionImageByChampionId = (championId) => {
+  console.log(championId);
   let url = '';
 
   Object.values(championAsset.data).forEach((champion) => {
-    if (champion.key === championId) {
-      const { full, group } = championAsset.data[champion].image;
+    console.log(champion);
+    if (champion.key === `${championId}`) {
+      const { full, group } = champion.image;
       url = `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
     }
   });

@@ -2,39 +2,52 @@ import PropTypes from 'prop-types';
 
 import Stack from '@mui/material/Stack';
 
-import MasteryIcon from './mastery-icon';
-import { ChampAvatar } from '../match-history-icon';
-import ImageIcon from '../image-icon';
+import { getChampionImageByChampionId } from 'src/utils/riot-image-asset';
 
-export default function ChampionMastery({ masteryInfo }) {
+import ImageIcon from '../image-icon';
+import MasteryIcon from './mastery-icon';
+
+export default function ChampionMasteryItem({ masteryInfo, main }) {
+  const champAvatarSize = main ? 70 : 55;
+  const masteryIconSize = main ? 50 : 45;
   return (
-    <Stack>
+    <Stack alignItems="center" sx={{ position: 'relative'}} justifyContent="flex-end">
       <ImageIcon
-        id={masteryInfo.}
-        getImageIconById={}
+        id={masteryInfo?.championId}
+        getImageIconById={getChampionImageByChampionId}
         sx={{
-          width: 45,
-          height: 45,
+          width: champAvatarSize,
+          height: champAvatarSize,
           borderRadius: 5,
           flexShrink: 0,
           border: '2px solid SlateGrey',
         }}
       />
-      <MasteryIcon level={7} />
+      <MasteryIcon
+        level={masteryInfo?.championLevel}
+        sx={{
+          width: masteryIconSize,
+          height: masteryIconSize,
+          position: 'absolute',
+          top: 58,
+        }}
+      />
     </Stack>
   );
 }
 
-ChampionMastery.propTypes = {
-  masteryInfo: PropTypes.object,
-// puuid: PropTypes
-// championId
-// championLevel
-// championPoints
-// lastPlayTime
-// championPointsSinceLastLevel
-// championPointsUntilNextLevel
-// chestGranted
-// tokensEarned
-// summonerId
+ChampionMasteryItem.propTypes = {
+  masteryInfo: PropTypes.shape({
+    puuid: PropTypes.string,
+    championId: PropTypes.number,
+    championLevel: PropTypes.number,
+    championPoints: PropTypes.number,
+    lastPlayTime: PropTypes.number,
+    championPointsSinceLastLevel: PropTypes.number,
+    championPointsUntilNextLevel: PropTypes.number,
+    chestGranted: PropTypes.bool,
+    tokensEarned: PropTypes.number,
+    summonerId: PropTypes.string,
+  }),
+  main: PropTypes.bool,
 };

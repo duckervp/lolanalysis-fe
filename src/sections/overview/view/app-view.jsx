@@ -5,6 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
+import ChampionMastery from 'src/components/champion-mastery';
 
 import AppTasks from '../app-tasks';
 import AppNewsUpdate from '../app-news-update';
@@ -61,6 +62,10 @@ export default function AppView() {
             color="error"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
+        </Grid>
+
+        <Grid xs={12} md={12} lg={12}>
+          <ChampionMastery />
         </Grid>
 
         <Grid xs={12} md={12} lg={12}>
