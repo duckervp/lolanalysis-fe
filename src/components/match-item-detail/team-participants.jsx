@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack';
 import DetailParticipantItem from './detail-participant-item';
 import DetailParticipantHeader from './detail-participant-header';
 
-export default function TeamParticipants({ team, participants }) {
+export default function TeamParticipants({ version, team, participants }) {
     const [teamKills, setTeamKills] = useState(0);
     const [teamDeaths, setTeamDeaths] = useState(0);
     const [teamAssists, setTeamAssists] = useState(0);
@@ -41,13 +41,14 @@ export default function TeamParticipants({ team, participants }) {
           teamGolds={teamGolds}
         />
         {participants?.map((participant) => (
-          <DetailParticipantItem key={participant?.puuid} participant={participant} />
+          <DetailParticipantItem key={participant?.puuid} version={version} participant={participant} />
         ))}
       </Stack>
     );
   }
   
   TeamParticipants.propTypes = {
+    version: PropTypes.string,
     team: PropTypes.string,
     participants: PropTypes.arrayOf(
       PropTypes.shape({

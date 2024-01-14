@@ -7,7 +7,7 @@ import { getChampionImageByChampionId } from 'src/utils/riot-image-asset';
 import ImageIcon from '../image-icon';
 import MasteryIcon from './mastery-icon';
 
-export default function ChampionMasteryItem({ masteryInfo, main }) {
+export default function ChampionMasteryItem({ version, masteryInfo, main }) {
   const champAvatarSize = main ? 70 : 55;
   const masteryIconSize = main ? 50 : 45;
   return (
@@ -15,6 +15,7 @@ export default function ChampionMasteryItem({ masteryInfo, main }) {
       <ImageIcon
         id={masteryInfo?.championId}
         getImageIconById={getChampionImageByChampionId}
+        version={version}
         sx={{
           width: champAvatarSize,
           height: champAvatarSize,
@@ -25,6 +26,7 @@ export default function ChampionMasteryItem({ masteryInfo, main }) {
       />
       <MasteryIcon
         level={masteryInfo?.championLevel}
+        
         sx={{
           width: masteryIconSize,
           height: masteryIconSize,
@@ -37,6 +39,7 @@ export default function ChampionMasteryItem({ masteryInfo, main }) {
 }
 
 ChampionMasteryItem.propTypes = {
+  version: PropTypes.string,
   masteryInfo: PropTypes.shape({
     puuid: PropTypes.string,
     championId: PropTypes.number,

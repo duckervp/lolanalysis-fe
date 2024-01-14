@@ -5,12 +5,18 @@ import Box from '@mui/material/Box';
 
 import { getItemImageUrl } from 'src/utils/riot-image-asset';
 
-const ItemBox = ({ itemId, width, height }) => {
+const ItemBox = ({ itemId, version, width, height }) => {
   const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {
-    setImageUrl(getItemImageUrl(itemId));
-  }, [itemId]);
+    const getItemImage = async () => {
+      const image = await getItemImageUrl(itemId, version);
+      setImageUrl(image);
+    }
+
+    getItemImage();
+
+  }, [itemId, version]);
 
   const style1 = {
     display: 'inline-block',
@@ -37,6 +43,7 @@ const ItemBox = ({ itemId, width, height }) => {
 
 ItemBox.propTypes = {
   itemId: PropTypes.number,
+  version: PropTypes.string,
   width: PropTypes.number,
   height: PropTypes.number,
 };

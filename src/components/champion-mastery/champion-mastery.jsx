@@ -1,5 +1,7 @@
 import Stack from '@mui/material/Stack';
 
+import { LOL_CURRENT_VERSION } from 'src/app-config';
+
 import ChampionMasteryItem from './champion-mastery-item';
 
 const DATA = [
@@ -45,7 +47,7 @@ export default function ChampionMastery() {
   return (
     <Stack direction="row" paddingY={10} spacing={1}>
       {abc(DATA).map((item, index) => (
-        <ChampionMasteryItem masteryInfo={item} main={index === 1} />
+        <ChampionMasteryItem key={item.championId} version={LOL_CURRENT_VERSION} masteryInfo={item} main={index === 1} />
       ))}
     </Stack>
   );

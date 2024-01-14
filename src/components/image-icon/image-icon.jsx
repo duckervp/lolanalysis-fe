@@ -5,14 +5,20 @@ import Box from '@mui/material/Box';
 
 import Loading from '../loading';
 
-export default function ImageIcon({ type, id, getImageIconById, sx }) {
+export default function ImageIcon({ type, id, version, getImageIconById, sx }) {
   const [imageIcon, setImageIcon] = useState();
 
   useEffect(() => {
-    setImageIcon(getImageIconById(id));
-  }, [id, getImageIconById]);
+    const fetchImage = async () => {
+      const image = await getImageIconById(id, version);
+      setImageIcon(image);
+    }
 
-  if (!id || !ImageIcon) {
+    fetchImage();
+    
+  }, [id, version, getImageIconById]);
+
+  if (!id || !imageIcon) {
     return <Loading type="circle" variant="indeterminate" />;
   }
 
@@ -22,6 +28,7 @@ export default function ImageIcon({ type, id, getImageIconById, sx }) {
 ImageIcon.propTypes = {
   type: PropTypes.string,
   id: PropTypes.number,
+  version: PropTypes.string,
   getImageIconById: PropTypes.func,
   sx: PropTypes.object,
 };

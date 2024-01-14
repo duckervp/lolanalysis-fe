@@ -34,6 +34,7 @@ export const convertMatch = (matchData) => {
     gameDuration: matchData.info.gameDuration,
     gameMode: matchData.info.gameMode,
     mapId: matchData.info.mapId,
+    version: matchData.info.gameVersion,
     participantDetails,
   };
 };
@@ -49,3 +50,8 @@ const getParticipantRuneId = (participant) => {
 
   return runeId;
 };
+
+export const getMatchVersion = (match) => {
+  const matchVersionInfo = match.version?.split(".");
+  return `${matchVersionInfo[0]}.${matchVersionInfo[1]}.1`;
+}

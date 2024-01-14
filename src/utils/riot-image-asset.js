@@ -1,47 +1,52 @@
-import mapAsset from 'src/assets/map.json';
-import itemAsset from 'src/assets/item.json';
-import championAsset from 'src/assets/champion.json';
-import summonerAsset from 'src/assets/summoner.json';
-import profileIconAsset from 'src/assets/profileicon.json';
-import runesReforgedAsset from 'src/assets/runesreforged.json';
-import { DDRAGON_URL, LOL_CURRENT_VERSION } from 'src/app-config';
+import axios from 'axios';
 
-export const getChampionImageUrl = (champion) => {
+import { DDRAGON_URL } from 'src/app-config';
+
+const fetchAsset = async (asset, version) => {
+  const { data } = await axios.get(`${DDRAGON_URL}/${version}/data/en_US/${asset}.json`);
+  return data;
+}
+
+export const getChampionImageUrl = async (champion, version) => {
+  const asset = await fetchAsset("champion", version);
+
   if (champion === 'FiddleSticks') {
     champion = 'Fiddlesticks';
   }
-  if (championAsset.data[champion]) {
-    const { full, group } = championAsset.data[champion].image;
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
+  if (asset.data[champion]) {
+    const { full, group } = asset.data[champion].image;
+    return `${DDRAGON_URL}/${version}/img/${group}/${full}`;
   }
   return undefined;
 };
 
-export const getChampionImageByChampionId = (championId) => {
-  console.log(championId);
+export const getChampionImageByChampionId = async (championId, version) => {
+  const asset = await fetchAsset("champion", version);
   let url = '';
 
-  Object.values(championAsset.data).forEach((champion) => {
-    console.log(champion);
+  Object.values(asset.data).forEach((champion) => {
     if (champion.key === `${championId}`) {
       const { full, group } = champion.image;
-      url = `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
+      url = `${DDRAGON_URL}/${version}/img/${group}/${full}`;
     }
   });
 
   return url === '' ? undefined : url;
 };
 
-export const getItemImageUrl = (item) => {
-  if (itemAsset.data[item]) {
-    const { full, group } = itemAsset.data[item].image;
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
+export const getItemImageUrl = async (item, version) => {
+  const asset = await fetchAsset("item", version);
+
+  if (asset.data[item]) {
+    const { full, group } = asset.data[item].image;
+    return `${DDRAGON_URL}/${version}/img/${group}/${full}`;
   }
   return undefined;
 };
 
-export const getSummonerImageUrl = (summonerId) => {
-  const summoners = summonerAsset.data;
+export const getSummonerImageUrl = async (summonerId, version) => {
+  const asset = await fetchAsset("summoner", version);
+  const summoners = asset.data;
 
   const selectedSummoner = Object.values(summoners).filter(
     (summoner) => parseInt(summoner.key, 10) === summonerId
@@ -49,29 +54,31 @@ export const getSummonerImageUrl = (summonerId) => {
 
   if (selectedSummoner) {
     const { full, group } = selectedSummoner.image;
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
+    return `${DDRAGON_URL}/${version}/img/${group}/${full}`;
   }
   return undefined;
 };
 
-export const getProfileIconImageUrl = (profileIconId) => {
+export const getProfileIconImageUrl = async (profileIconId, version) => {
+  const asset = await fetchAsset("profileicon", version);
   const profileIcon = `${profileIconId}`;
 
-  if (profileIconAsset.data[profileIcon]) {
-    const { full, group } = profileIconAsset.data[profileIcon].image;
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
+  if (asset.data[profileIcon]) {
+    const { full, group } = asset.data[profileIcon].image;
+    return `${DDRAGON_URL}/${version}/img/${group}/${full}`;
   }
   return undefined;
 };
 
-export const getMapName = (mapId) => {
-  if (mapAsset.data[mapId]) {
-    return mapAsset.data[mapId].MapName;
+export const getMapName = async ( mapId, version) => {
+  const asset = await fetchAsset("map", version);
+  if (asset.data[mapId]) {
+    return asset.data[mapId].MapName;
   }
   return undefined;
 };
 
-export const getMapIconUrl = (mapId) => {
+export const getMapIconUrl = async (mapId, version) => {
   if (mapId === 11) {
     return "src/assets/icon_summoner's_rift.png";
   }
@@ -80,18 +87,14 @@ export const getMapIconUrl = (mapId) => {
     return 'src/assets/icon_howling_abyss.png';
   }
 
-  if (mapId === 22 && mapAsset.data[mapId]) {
-    const { full, group } = mapAsset.data[mapId].image;
-    return `${DDRAGON_URL}/${LOL_CURRENT_VERSION}/img/${group}/${full}`;
-  }
-
   return 'src/assets/icon_featured_game_mode.png';
 };
 
-export const getRunesIconImageUrl = (runeId) => {
+export const getRunesIconImageUrl = async (runeId, version) => {
+  const asset = await fetchAsset("runesReforged", version);
   let iconImageUrl = '';
 
-  runesReforgedAsset?.forEach((item) => {
+  asset?.forEach((item) => {
     item.slots[0]?.runes?.forEach((rune) => {
       if (rune?.id === runeId) {
         iconImageUrl = `${DDRAGON_URL}/img/${rune?.icon}`;

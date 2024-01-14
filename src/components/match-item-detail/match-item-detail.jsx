@@ -15,6 +15,8 @@ import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 import Scrollbar from 'src/components/scrollbar';
 import { MapIcon } from 'src/components/match-history-icon';
 
+import { getMatchVersion } from 'src/sections/overview/utils';
+
 import TeamParticipants from './team-participants';
 import MatchTimeDetail from '../match-item/match-time-detail';
 
@@ -24,6 +26,18 @@ export default function MatchDetail({ match }) {
   const [blueTeamParticipants, setBlueTeamParticipants] = useState([]);
 
   const [redTeamParticipants, setRedTeamParticipants] = useState([]);
+
+  const [matchMapName, setMatchMapName] = useState();
+
+  useEffect(() => {
+    const fetchMapName = async () => {
+      const version = getMatchVersion(match);
+      const mapName = await getMapName(match?.matchId, version);
+      setMatchMapName(mapName);
+    }
+
+    fetchMapName();
+  }, [match]);
 
   useEffect(() => {
     const blueTeamMembers = [];
@@ -62,12 +76,13 @@ export default function MatchDetail({ match }) {
         <Stack direction="row" spacing={2} alignItems="center">
           <MapIcon
             mapId={match?.mapId}
+            version={getMatchVersion(match)}
             sx={{ width: 65, height: 65, borderRadius: 0.5, backgroundColor: 'lightblue' }}
           />
           <Stack>
             <Typography variant="h3">WIN</Typography>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="body2">{getMapName(match?.mapId)}</Typography>
+              <Typography variant="body2">{matchMapName}</Typography>
               <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
               <Typography variant="caption">{match?.gameMode}</Typography>
               <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
@@ -80,8 +95,8 @@ export default function MatchDetail({ match }) {
         </Stack>
         <Divider sx={{ my: 2 }} />
         <Stack>
-          <TeamParticipants team="TEAM 1" participants={blueTeamParticipants} />
-          <TeamParticipants team="TEAM 2" participants={redTeamParticipants} />
+          <TeamParticipants version={getMatchVersion(match)} team="TEAM 1" participants={blueTeamParticipants} />
+          <TeamParticipants version={getMatchVersion(match)} team="TEAM 2" participants={redTeamParticipants} />
         </Stack>
       </Scrollbar>
     </Card>

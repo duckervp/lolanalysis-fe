@@ -14,7 +14,7 @@ import { Spells, RuneIcon, ChampAvatar } from 'src/components/match-history-icon
 import KDA from '../kda';
 import ItemBoxList from '../match-item/item-box-list';
 
-export default function DetailParticipantItem({ participant }) {
+export default function DetailParticipantItem({ participant, version }) {
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
 
   return (
@@ -22,11 +22,13 @@ export default function DetailParticipantItem({ participant }) {
       <Stack direction="row" alignItems="center" spacing={1}>
         <RuneIcon
           runeId={participant?.primaryRuneId}
+          version={version}
           sx={{ width: 40, height: 40, background: 'gray', borderRadius: 0.5 }}
         />
         <Spells
           spellD={participant?.spellD}
           spellF={participant?.spellF}
+          version={version}
           width={20}
           height={20}
           direction="column"
@@ -39,6 +41,7 @@ export default function DetailParticipantItem({ participant }) {
         </Typography>
         <ChampAvatar
           champName={participant?.championName}
+          version={version}
           sx={{
             width: 45,
             height: 45,
@@ -55,7 +58,7 @@ export default function DetailParticipantItem({ participant }) {
           {participant?.riotIdGameName}
         </Typography>
       </Stack>
-      <ItemBoxList items={participant?.items} width={40} height={40} />
+      <ItemBoxList items={participant?.items} version={version} width={40} height={40} />
       <Box width={20} />
       <Stack
         direction="row"
@@ -109,6 +112,7 @@ DetailParticipantItem.propTypes = {
     teamId: PropTypes.number,
     primaryRuneId: PropTypes.number,
   }),
+  version: PropTypes.string,
 };
 
 const getDetailParticipantColor = (participant, currentAccountPuuid) =>
