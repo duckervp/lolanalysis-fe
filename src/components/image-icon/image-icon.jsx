@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 
-import Loading from '../loading';
-
 export default function ImageIcon({ type, id, version, getImageIconById, sx }) {
+  console.log("image icon ", type, version);
   const [imageIcon, setImageIcon] = useState();
 
   useEffect(() => {
@@ -19,7 +18,7 @@ export default function ImageIcon({ type, id, version, getImageIconById, sx }) {
   }, [id, version, getImageIconById]);
 
   if (!id || !imageIcon) {
-    return <Loading type="circle" variant="indeterminate" />;
+    return <Box sx={sx} />;
   }
 
   return <Box component="img" alt={`${type}Id-${id}`} src={imageIcon} sx={sx} />;

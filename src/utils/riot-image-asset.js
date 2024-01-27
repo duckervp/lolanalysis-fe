@@ -1,9 +1,13 @@
-import axios from 'axios';
+// import axios from 'axios';
 
 import { DDRAGON_URL } from 'src/app-config';
 
+import { getData } from './cache';
+
 const fetchAsset = async (asset, version) => {
-  const { data } = await axios.get(`${DDRAGON_URL}/${version}/data/en_US/${asset}.json`);
+  const url = `${DDRAGON_URL}/${version}/data/en_US/${asset}.json`;
+  // const { data } = await axios.get(url);
+  const data = await getData(url)
   return data;
 }
 

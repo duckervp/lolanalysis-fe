@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import { getItemImageUrl } from 'src/utils/riot-image-asset';
 
 const ItemBox = ({ itemId, version, width, height }) => {
+  console.log("item box", itemId, version);
   const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {

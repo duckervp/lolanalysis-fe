@@ -5,9 +5,8 @@ import Box from '@mui/material/Box';
 
 import { getChampionImageUrl } from 'src/utils/riot-image-asset';
 
-import Loading from '../loading';
-
 export default function ChampAvatar({ champName, version, sx }) {
+  console.log("ChampAvatar", champName);
   const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {
@@ -20,7 +19,7 @@ export default function ChampAvatar({ champName, version, sx }) {
   }, [champName, version]);
 
   if (!imageUrl) {
-    return <Loading type="circle" variant="indeterminate" />;
+    return <Box sx={sx} />;
   }
 
   return <Box component="img" alt={champName} src={imageUrl} sx={sx} />;
