@@ -41,11 +41,5 @@ async function deleteOldCaches(currentCache) {
       return;
     }
     caches.delete(key);
-  });  }
-
-try {
-  const data = await getData();
-  console.log({ data });
-} catch (error) {
-  console.error({ error });
+  });  
 }

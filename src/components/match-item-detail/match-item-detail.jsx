@@ -32,7 +32,7 @@ export default function MatchDetail({ match }) {
   useEffect(() => {
     const fetchMapName = async () => {
       const version = getMatchVersion(match);
-      const mapName = await getMapName(match?.matchId, version);
+      const mapName = await getMapName(match?.mapId, version);
       setMatchMapName(mapName);
     }
 

@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 import { getChampionImageUrl } from 'src/utils/riot-image-asset';
 
 export default function ChampAvatar({ champName, version, sx }) {
-  console.log("ChampAvatar", champName);
   const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {

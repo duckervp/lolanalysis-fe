@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 
 export default function ImageIcon({ type, id, version, getImageIconById, sx }) {
-  console.log("image icon ", type, version);
   const [imageIcon, setImageIcon] = useState();
 
   useEffect(() => {

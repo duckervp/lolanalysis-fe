@@ -7,9 +7,9 @@ import { ItemBox } from 'src/components/match-history-icon';
 export default function ItemBoxList({ items, version, width, height }) {
   return (
     <Stack direction="row" alignItems="center">
-      {items?.map((item) => (
+      {items?.map((item, index) => (
         <ItemBox
-          key={`item-${item}-${Math.random()}`}
+          key={`item-${item}-${index}`}
           itemId={item}
           version={version}
           width={width}

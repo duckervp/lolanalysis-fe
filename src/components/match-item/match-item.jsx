@@ -19,7 +19,8 @@ import KDA from '../kda';
 import ItemBoxList from './item-box-list';
 import MatchTimeDetail from './match-time-detail';
 
-export default function MatchItem({ match }) {
+function MatchItem({ match }) {
+  console.log("MatchItem re-render");
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
 
   const [currentUserChamp, setCurrentUserChamp] = useState();
@@ -29,7 +30,7 @@ export default function MatchItem({ match }) {
   useEffect(() => {
     const fetchMapName = async () => {
       const version = getMatchVersion(match);
-      const mapName = await getMapName(match?.matchId, version);
+      const mapName = await getMapName(match?.mapId, version);
       setMatchMapName(mapName);
     };
 
@@ -173,3 +174,5 @@ MatchItem.propTypes = {
     ),
   }),
 };
+
+export default MatchItem;

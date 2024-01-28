@@ -24,6 +24,7 @@ import { convertMatch } from './utils';
 // ----------------------------------------------------------------------
 
 export default function AppMatchHistory({ title, subheader, ...other }) {
+  console.log("AppMatchHistory re-render");
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
 
   const [loading, setLoading] = useState(false);
@@ -59,7 +60,7 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
   }, [matchIds]);
 
   const callRiotMatchHistoryAPI = async (puuid) => {
-    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=20`;
+    const url = `${BASE_URL}/riot/lol/matches?puuid=${puuid}&count=10`;
     const { data: result } = await axios.get(url);
     return result.data;
   };
