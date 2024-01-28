@@ -7,13 +7,14 @@ import { getSummonerImageUrl } from 'src/utils/riot-image-asset';
 import ImageIcon from '../image-icon';
 
 export default function Spells({ version, spellD, spellF, width, height, direction }) {
+  const totalWidth = 2 * width + 1;
   const style = {
     width,
     height,
     flexShrink: 0,
   };
   return (
-    <Stack sx={{ border: '1px solid SlateGrey', mt: 0.5 }} direction={direction}>
+    <Stack sx={{ border: '1px solid SlateGrey', mt: 0.5, width: direction === "row" ? totalWidth: undefined }} direction={direction}>
       <ImageIcon type="Spell D" id={spellD} version={version} getImageIconById={getSummonerImageUrl} sx={style} />
       <ImageIcon type="Spell F" id={spellF} version={version} getImageIconById={getSummonerImageUrl} sx={style} />
     </Stack>

@@ -89,7 +89,7 @@ function MatchItem({ match }) {
           variant="h6"
           sx={currentUserChamp?.win ? { color: 'green', height: 18 } : { color: 'red', height: 18 }}
         >
-          {currentUserChamp?.win ? 'WIN' : 'LOST'}
+          {currentUserChamp?.win ? "VICTORY" : "DEFEAT"}
         </Typography>
         <Typography variant="caption">{match?.gameMode}</Typography>
         <Spells

@@ -76,7 +76,6 @@ export const getProfileIconImageUrl = async (profileIconId, version) => {
 
 export const getMapName = async (mapId, version) => {
   const asset = await fetchAsset("map", version);
-  console.log(asset);
   console.log("mapId", mapId);
   if (asset.data[mapId]) {
     return asset.data[mapId].MapName;

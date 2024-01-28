@@ -29,6 +29,8 @@ export default function MatchDetail({ match }) {
 
   const [matchMapName, setMatchMapName] = useState();
 
+  const [win, setWin] = useState();
+
   useEffect(() => {
     const fetchMapName = async () => {
       const version = getMatchVersion(match);
@@ -49,6 +51,7 @@ export default function MatchDetail({ match }) {
       if (participant.puuid === currentAccountPuuid) {
         currentAccountTeamId = participant.teamId;
         currentAccountParticipant = participant;
+        setWin(participant.win);
       }
     });
 
@@ -70,6 +73,8 @@ export default function MatchDetail({ match }) {
     }
   }, [match, currentAccountPuuid]);
 
+
+
   return (
     <Card>
       <Scrollbar sx={{ padding: 4 }}>
@@ -80,7 +85,7 @@ export default function MatchDetail({ match }) {
             sx={{ width: 65, height: 65, borderRadius: 0.5, backgroundColor: 'lightblue' }}
           />
           <Stack>
-            <Typography variant="h3">WIN</Typography>
+            <Typography variant="h3">{win ? "VICTORY" : "DEFEAT"}</Typography>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography variant="body2">{matchMapName}</Typography>
               <PanoramaFishEyeTwoToneIcon style={{ fontSize: 7 }} />
