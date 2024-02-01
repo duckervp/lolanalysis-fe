@@ -24,7 +24,7 @@ import AppSummonerProfile from '../app-summoner-profile';
 
 export default function AppView() {
   const [summonerInfo, setSummonerInfo] = useState({});
-  const [indexes, setIndexes] = useState({});
+  const [indexes, setIndexes] = useState(null);
   const [lolCurrentVersion, setLolCurrentVersion] = useState();
   const puuid = useSelector(selectCurrentAccountPuuid);
 
@@ -105,7 +105,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={12} lg={8}>
-          <AppMatchHistory title="Match History" />
+          <AppMatchHistory title="Match History" isIndexesReady={indexes !== null} />
         </Grid>
 
         <Grid xs={12} md={12} lg={4}>

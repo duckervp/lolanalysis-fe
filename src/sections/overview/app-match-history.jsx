@@ -23,7 +23,7 @@ import MatchItemDetail from 'src/components/match-item-detail';
 import { convertMatch } from './utils';
 // ----------------------------------------------------------------------
 
-export default function AppMatchHistory({ title, subheader, ...other }) {
+export default function AppMatchHistory({ title, subheader, isIndexesReady, ...other }) {
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
 
   const [loading, setLoading] = useState(false);
@@ -37,14 +37,14 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
       const matchIdsData = await callRiotMatchHistoryAPI(currentAccountPuuid);
       setMatchIds(matchIdsData);
     };
-    if (currentAccountPuuid) {
+    if (currentAccountPuuid && isIndexesReady) {
       setLoading(true);
       fetchMatchHistory();
     } else {
       setMatchIds([]);
       setMatches([]);
     }
-  }, [currentAccountPuuid]);
+  }, [currentAccountPuuid, isIndexesReady]);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -122,4 +122,5 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
 AppMatchHistory.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
+  isIndexesReady: PropTypes.bool
 };
