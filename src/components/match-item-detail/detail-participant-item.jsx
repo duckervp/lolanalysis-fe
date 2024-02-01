@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { numberWithCommas } from 'src/utils/format-number';
+import { numberWithDot } from 'src/utils/format-number';
 
 import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 
@@ -86,7 +86,7 @@ export default function DetailParticipantItem({ participant, version }) {
           textAlign="center"
           color={getDetailParticipantColor(participant, currentAccountPuuid)}
         >
-          {numberWithCommas(participant?.goldEarned)}
+          {numberWithDot(participant?.goldEarned)}
         </Typography>
       </Stack>
     </Stack>

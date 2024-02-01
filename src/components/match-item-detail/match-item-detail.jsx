@@ -94,6 +94,7 @@ export default function MatchDetail({ match }) {
               <MatchTimeDetail
                 gameCreation={match?.gameCreation}
                 gameDuration={match?.gameDuration}
+                gameCreationTime
               />
             </Stack>
           </Stack>

@@ -1,55 +1,59 @@
+import axios from 'axios';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+
+import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 
-import { LOL_CURRENT_VERSION } from 'src/app-config';
+import { BASE_URL } from 'src/app-config';
 
 import ChampionMasteryItem from './champion-mastery-item';
 
-const DATA = [
-  {
-    puuid: 'miyF5bYOgWve2J82vsSgzA6BdMg2FV4rf6V4xXCtkxV5Z0gJYcV_XpzgD5eQ68NjB7IY85pC6PLF1Q',
-    championId: 103,
-    championLevel: 7,
-    championPoints: 142728,
-    lastPlayTime: 1703177884000,
-    championPointsSinceLastLevel: 121128,
-    championPointsUntilNextLevel: 0,
-    chestGranted: false,
-    tokensEarned: 0,
-    summonerId: 'pS5pOEOx8y54PZ4qygkheTmBBEQSGtGhdeOTemxej9kxyoCG',
-  },
-  {
-    puuid: 'miyF5bYOgWve2J82vsSgzA6BdMg2FV4rf6V4xXCtkxV5Z0gJYcV_XpzgD5eQ68NjB7IY85pC6PLF1Q',
-    championId: 99,
-    championLevel: 7,
-    championPoints: 129514,
-    lastPlayTime: 1704548828000,
-    championPointsSinceLastLevel: 107914,
-    championPointsUntilNextLevel: 0,
-    chestGranted: false,
-    tokensEarned: 0,
-    summonerId: 'pS5pOEOx8y54PZ4qygkheTmBBEQSGtGhdeOTemxej9kxyoCG',
-  },
-  {
-    puuid: 'miyF5bYOgWve2J82vsSgzA6BdMg2FV4rf6V4xXCtkxV5Z0gJYcV_XpzgD5eQ68NjB7IY85pC6PLF1Q',
-    championId: 25,
-    championLevel: 6,
-    championPoints: 86066,
-    lastPlayTime: 1704562092000,
-    championPointsSinceLastLevel: 64466,
-    championPointsUntilNextLevel: 0,
-    chestGranted: false,
-    tokensEarned: 2,
-    summonerId: 'pS5pOEOx8y54PZ4qygkheTmBBEQSGtGhdeOTemxej9kxyoCG',
-  },
-];
+export default function ChampionMastery({ lolCurrentVersion, puuid }) {
+  const [masteryData, setMasteryData] = useState([]);
 
-export default function ChampionMastery() {
+  useEffect(() => {
+    const fetchChampionMastery = async () => {
+      const data = await callMasteryAPI(puuid);
+      setMasteryData(data);
+    };
+
+    if (puuid && lolCurrentVersion) {
+      fetchChampionMastery();
+    }
+  }, [lolCurrentVersion, puuid]);
+
+  const callMasteryAPI = async (uuid) => {
+    const url = `${BASE_URL}/riot/lol/champion-mastery/${uuid}?orderByLevel=true&count=3`;
+    const { data: result } = await axios.get(url);
+    return result.data;
+  };
+
   return (
-    <Stack direction="row" paddingY={10} spacing={1}>
-      {abc(DATA).map((item, index) => (
-        <ChampionMasteryItem key={item.championId} version={LOL_CURRENT_VERSION} masteryInfo={item} main={index === 1} />
-      ))}
-    </Stack>
+    <Card
+      component={Stack}
+      spacing={3}
+      direction="row"
+      sx={{
+        px: 3,
+        py: 3,
+        borderRadius: 2,
+        height: 250,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Stack direction="row" spacing={4}>
+        {abc(masteryData).map((item, index) => (
+          <ChampionMasteryItem
+            key={item.championId}
+            version={lolCurrentVersion}
+            masteryInfo={item}
+            main={index === 1}
+          />
+        ))}
+      </Stack>
+    </Card>
   );
 }
 
@@ -60,3 +64,8 @@ function abc(masteries) {
   const [main, sub1, sub2] = masteries;
   return [sub1, main, sub2];
 }
+
+ChampionMastery.propTypes = {
+  lolCurrentVersion: PropTypes.string,
+  puuid: PropTypes.string,
+};

@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { numberWithCommas } from 'src/utils/format-number';
+import { numberWithDot } from 'src/utils/format-number';
 
 import { GoldIcon, AttackIcon, MinionsIcon } from 'src/components/match-history-icon';
 
@@ -32,7 +32,7 @@ export default function DetailParticipantHeader({
       </Stack>
       <Stack direction="row" alignItems="center" sx={{ width: 273 }} justifyContent="center">
         <Typography variant="subtitle1" mr={0.5} color="GrayText">
-          {numberWithCommas(teamGolds)}
+          {numberWithDot(teamGolds)}
         </Typography>
         <GoldIcon sx={{ height: iconSize }} />
       </Stack>

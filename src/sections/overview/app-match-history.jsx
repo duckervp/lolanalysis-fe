@@ -24,7 +24,6 @@ import { convertMatch } from './utils';
 // ----------------------------------------------------------------------
 
 export default function AppMatchHistory({ title, subheader, ...other }) {
-  console.log("AppMatchHistory re-render");
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
 
   const [loading, setLoading] = useState(false);
@@ -69,7 +68,6 @@ export default function AppMatchHistory({ title, subheader, ...other }) {
     const queryString = `?matchIds=${ids.join(',')}`;
     const url = `${BASE_URL}/matches/by-ids${queryString}`;
     const { data: result } = await axios.get(url);
-    console.log(result);
     return result.data;
   };
 

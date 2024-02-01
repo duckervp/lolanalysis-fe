@@ -5,11 +5,11 @@ export async function getData(url) {
   let cachedData = await getCachedData(cacheName, url);
 
   if (cachedData) {
-    console.log("Retrieved cached data");
+    console.log("Retrieved cached data for ", url);
     return cachedData;
   }
 
-  console.log("Fetching fresh data");
+  console.log("Fetching fresh data for ", url);
 
   const cacheStorage = await caches.open(cacheName);
   await cacheStorage.add(url);

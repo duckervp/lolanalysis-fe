@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { getMapName } from 'src/utils/riot-image-asset';
-import { numberWithCommas } from 'src/utils/format-number';
+import { numberWithDot } from 'src/utils/format-number';
 
 import { selectCurrentAccountPuuid } from 'src/redux/slice/accountSlice';
 
@@ -20,7 +20,6 @@ import ItemBoxList from './item-box-list';
 import MatchTimeDetail from './match-time-detail';
 
 function MatchItem({ match }) {
-  console.log("MatchItem re-render");
   const currentAccountPuuid = useSelector(selectCurrentAccountPuuid);
 
   const [currentUserChamp, setCurrentUserChamp] = useState();
@@ -87,9 +86,13 @@ function MatchItem({ match }) {
       <Box>
         <Typography
           variant="h6"
-          sx={currentUserChamp?.win ? { color: 'green', height: 18 } : { color: 'red', height: 18 }}
+          sx={
+            currentUserChamp?.win
+              ? { color: 'green', height: 18, width: 75 }
+              : { color: 'red', height: 18, width: 75 }
+          }
         >
-          {currentUserChamp?.win ? "VICTORY" : "DEFEAT"}
+          {currentUserChamp?.win ? 'VICTORY' : 'DEFEAT'}
         </Typography>
         <Typography variant="caption">{match?.gameMode}</Typography>
         <Spells
@@ -101,7 +104,7 @@ function MatchItem({ match }) {
           direction="row"
         />
       </Box>
-      <Box sx={{ width: 40 }} />
+      <Box sx={{ width: 20 }} />
       <Stack>
         <ItemBoxList
           items={currentUserChamp?.items}
@@ -129,12 +132,13 @@ function MatchItem({ match }) {
           </Stack>
           <Stack direction="row" alignItems="flex-end" spacing={0.5}>
             <Typography variant="subtitle1" sx={{ height: 18 }}>
-              {numberWithCommas(currentUserChamp?.goldEarned)}
+              {numberWithDot(currentUserChamp?.goldEarned)}
             </Typography>
             <GoldIcon sx={{ height: 12.5 }} />
           </Stack>
         </Stack>
       </Stack>
+      <Box sx={{ width: 10 }} />
       <Stack alignItems="flex-start">
         <Typography variant="body2">{matchMapName}</Typography>
         <MatchTimeDetail gameCreation={match?.gameCreation} gameDuration={match?.gameDuration} />
