@@ -13,7 +13,7 @@ export default function AppDetailSummary({ title, total, isTimeField }) {
       <Typography variant="h6" sx={{ color: 'text.disabled' }}>
         {title}:
       </Typography>
-      {isTimeField && <Typography variant="h6">{total / 60}mins</Typography>}
+      {isTimeField && <Typography variant="h6">{(Math.round(total / 60 * 100) / 100).toFixed(2)}mins</Typography>}
       {!isTimeField && (
         <Typography variant="h6">{total === 0 ? 0 : fShortenNumber(total)}</Typography>
       )}
